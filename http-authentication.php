@@ -1,20 +1,20 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: $Revision: 1.7 $
-Plugin URI: http://www.webadmin.ufl.edu/
+Version: 0.9
+Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/02/authentication-plugins/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated (as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>). WARNING: If you disable this plugin, make sure you set each user's password to something more secure than their username.
 Author: Daniel Westermann-Clark
-Author URI: http://www.webadmin.ufl.edu/
+Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
 
 add_action('admin_menu', array('HTTPAuthentication', 'admin_menu'));
-add_action('wp_authenticate', array('HTTPAuthentication', 'login'));
+add_action('wp_authenticate', array('HTTPAuthentication', 'login'), 10, 3);
 add_action('wp_logout', array('HTTPAuthentication', 'logout'));
 add_action('lost_password', array('HTTPAuthentication', 'disable_function'));
 add_action('retrieve_password', array('HTTPAuthentication', 'disable_function'));
 add_action('password_reset', array('HTTPAuthentication', 'disable_function'));
-add_action('check_passwords', array('HTTPAuthentication', 'check_passwords'));
+add_action('check_passwords', array('HTTPAuthentication', 'check_passwords'), 10, 4);
 add_filter('show_password_fields', array('HTTPAuthentication', 'show_password_fields'));
 
 
@@ -73,7 +73,7 @@ if (! class_exists('HTTPAuthentication')) {
 		 * If the REMOTE_USER evironment is set, use it as the username.
 		 * This assumes that you have externally authenticated the user.
 		 */
-		function login($username, $password) {
+		function login($string, $username, $password) {
 			if ($_SERVER['REMOTE_USER']) {
 				$username = $_SERVER['REMOTE_USER'];
 				$password = $username;
@@ -92,7 +92,7 @@ if (! class_exists('HTTPAuthentication')) {
 		 * "Verify" the user's password entries by returning the value
 		 * used by this plugin.
 		 */
-		function check_passwords($username, $password1, $password2) {
+		function check_passwords($string, $username, $password1, $password2) {
 			$password1 = $password2 = $username;
 		}
 
