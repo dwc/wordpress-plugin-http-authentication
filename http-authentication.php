@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 1.0
+Version: 1.1
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/http-authentication-plugin/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated (as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>). WARNING: If you disable this plugin, make sure you set each user's password to something more secure than their username.
 Author: Daniel Westermann-Clark
@@ -9,7 +9,8 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
 
 add_action('admin_menu', array('HTTPAuthentication', 'admin_menu'));
-add_action('wp_authenticate', array('HTTPAuthentication', 'login'), 10, 2);
+add_action('wp_authenticate', array('HTTPAuthentication', 'authenticate'), 10, 2);
+add_action('wp_login', array('HTTPAuthentication', 'login'));
 add_action('wp_logout', array('HTTPAuthentication', 'logout'));
 add_action('lost_password', array('HTTPAuthentication', 'disable_function'));
 add_action('retrieve_password', array('HTTPAuthentication', 'disable_function'));
@@ -44,11 +45,12 @@ if (! class_exists('HTTPAuthentication')) {
 		 * Add an options pane for this plugin.
 		 */
 		function admin_menu() {
-			add_options_page('HTTP Authentication', 'HTTP Authentication', 10, __FILE__);
+			add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__);
 		}
 
 		/*
-		 * Return the logout URI from the database, creating the option if it doesn't exist.
+		 * Return the logout URI from the database, creating the option
+		 * if it doesn't exist.
 		 */
 		function get_logout_uri() {
 			global $cache_nonexistantoptions;
@@ -73,10 +75,24 @@ if (! class_exists('HTTPAuthentication')) {
 		 * If the REMOTE_USER evironment is set, use it as the username.
 		 * This assumes that you have externally authenticated the user.
 		 */
-		function login($username, $password) {
+		function authenticate($username, $password) {
 			if ($_SERVER['REMOTE_USER']) {
 				$username = $_SERVER['REMOTE_USER'];
 				$password = $username;
+			}
+		}
+
+		/*
+		 * Once WordPress has verified the login, set the redirect
+		 * target appropriately. This is done because wp-login.php never
+		 * sees a POST with the correct redirect_to variable, which
+		 * breaks plugins like registered-only.
+		 */
+		function login($username) {
+			global $redirect_to;
+
+			if (! empty($_REQUEST['redirect_to'])) {
+				$redirect_to = $_REQUEST['redirect_to'];
 			}
 		}
 
