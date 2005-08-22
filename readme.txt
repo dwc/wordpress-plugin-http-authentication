@@ -12,6 +12,7 @@ The HTTP Authentication plugin allows you to use existing means of authenticatin
 4. Add one or more users to WordPress, specifying the external username for the Nickname field. Also be sure to set the level for each user.
 5. Logout.
 6. Protect `wp-login.php` and `wp-admin` using your external authentication (using, for example, `.htaccess` files).
+7. Try logging in as one of the users added in step 4.
 
 == Frequently Asked Questions ==
 
@@ -32,6 +33,8 @@ AuthUserFile /path/to/passwords
 Require user dwc
 </Files>`
 
+(You may also want to protect your `xmlrpc.php` file, which uses separate authentication code.)
+
 Then, create another `.htaccess` file in your `wp-admin` directory with the following contents:
 
 `AuthName "WordPress"
@@ -44,3 +47,19 @@ In both files, be sure to set `/path/to/passwords` to the location of your passw
 = Where can I find more information on configuring Apache authentication? =
 
 See Apache's HOWTO: <a href="http://httpd.apache.org/docs/howto/auth.html">Authentication, Authorization, and Access Control</a>.
+
+= How does this plugin authenticate users? =
+
+This plugin doesn't actually authenticate users. It simply feeds WordPress the name of a user who has successfully authenticated through Apache.
+
+To determine the username, this plugin uses the `REMOTE_USER` environment variable, which is set by many Apache authentication modules. If someone can find a way to spoof this value, this plugin is not guaranteed to be secure.
+
+This plugin generates a random password each time you create a user or edit an existing user's profile. However, since this plugin requires an external authentication mechanism, this password is not requested by WordPress. Generating a random password helps protect accounts, preventing one authorized user from pretending to be another.
+
+= If I disable this plugin, how will I login? =
+
+Because this plugin generates a random password when you create a new user or edit an existing user's profile, you will most likely have to reset each user's password if you disable this plugin. WordPress provides a link for requesting a new password on the login screen.
+
+You may also want to leave the `admin` user as a fallback. As long as you don't edit the `admin` profile, WordPress will store the password set when you installed WordPress.
+
+In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to <a href="http://codex.wordpress.org/Resetting_Your_Password">reset a user's password</a>.

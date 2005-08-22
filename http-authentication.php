@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 1.1
+Version: 1.2
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/http-authentication-plugin/
-Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated (as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>). WARNING: If you disable this plugin, make sure you set each user's password to something more secure than their username.
+Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated (as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>).
 Author: Daniel Westermann-Clark
 Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
@@ -76,9 +76,24 @@ if (! class_exists('HTTPAuthentication')) {
 		 * This assumes that you have externally authenticated the user.
 		 */
 		function authenticate($username, $password) {
+			global $using_cookie, $wpdb;
+
+			// Reset values from input ($_POST and $_COOKIE)
+			$username = $password = '';
+
 			if ($_SERVER['REMOTE_USER']) {
 				$username = $_SERVER['REMOTE_USER'];
-				$password = $username;
+
+				// WordPress expects a double-MD5 hash, so MD5 the value in the database (MD5 of password generated in check_password)
+				$password = $wpdb->get_var("SELECT MD5(user_pass) FROM $wpdb->users WHERE user_login = '$username'");
+				if ($password) {
+					// User is authorized; now force WordPress to use the generated password
+					$using_cookie = true;
+					wp_setcookie($username, $password, $using_cookie);
+				}
+				else {
+					$username = $password = '';
+				}
 			}
 		}
 
@@ -92,7 +107,7 @@ if (! class_exists('HTTPAuthentication')) {
 			global $redirect_to;
 
 			if (! empty($_REQUEST['redirect_to'])) {
-				$redirect_to = $_REQUEST['redirect_to'];
+				$redirect_to = preg_replace('|[^a-z0-9-~+_.?#=&;,/:]|i', '', $_REQUEST['redirect_to']);
 			}
 		}
 
@@ -105,11 +120,12 @@ if (! class_exists('HTTPAuthentication')) {
 		}
 
 		/*
-		 * "Verify" the user's password entries by returning the value
-		 * used by this plugin.
+		 * Generate a password for the user. This plugin does not
+		 * require the user to enter this value, but we want to set it
+		 * to something nonobvious.
 		 */
 		function check_passwords($username, $password1, $password2) {
-			$password1 = $password2 = $username;
+			$password1 = $password2 = substr(md5(uniqid(microtime())), 0, 10);
 		}
 
 		/*
