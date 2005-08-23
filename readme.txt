@@ -60,6 +60,6 @@ This plugin generates a random password each time you create a user or edit an e
 
 Because this plugin generates a random password when you create a new user or edit an existing user's profile, you will most likely have to reset each user's password if you disable this plugin. WordPress provides a link for requesting a new password on the login screen.
 
-You may also want to leave the `admin` user as a fallback. As long as you don't edit the `admin` profile, WordPress will store the password set when you installed WordPress.
+Also, you should leave the `admin` user as a fallback, i.e. create a new account to use with this plugin. As long as you don't edit the `admin` profile, WordPress will store the password set when you installed WordPress.
 
 In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to <a href="http://codex.wordpress.org/Resetting_Your_Password">reset a user's password</a>.
