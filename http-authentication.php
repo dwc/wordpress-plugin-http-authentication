@@ -84,7 +84,7 @@ if (! class_exists('HTTPAuthentication')) {
 			if ($_SERVER['REMOTE_USER']) {
 				$username = $_SERVER['REMOTE_USER'];
 
-				// WordPress expects a double-MD5 hash, so MD5 the value in the database (MD5 of password generated in check_password)
+				// WordPress expects a double-MD5 hash (MD5 of value generated in check_passwords)
 				$password = $wpdb->get_var("SELECT MD5(user_pass) FROM $wpdb->users WHERE user_login = '$username'");
 				if ($password) {
 					// User is authorized; now force WordPress to use the generated password
@@ -92,6 +92,7 @@ if (! class_exists('HTTPAuthentication')) {
 					wp_setcookie($username, $password, $using_cookie);
 				}
 				else {
+					// User is not in the WordPress database, and thus not authorized
 					$username = $password = '';
 				}
 			}
