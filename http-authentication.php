@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 1.2
+Version: 1.3
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/http-authentication-plugin/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated (as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>).
 Author: Daniel Westermann-Clark
@@ -84,12 +84,14 @@ if (! class_exists('HTTPAuthentication')) {
 			if ($_SERVER['REMOTE_USER']) {
 				$username = $_SERVER['REMOTE_USER'];
 
-				// WordPress expects a double-MD5 hash (MD5 of value generated in check_passwords)
-				$password = $wpdb->get_var("SELECT MD5(user_pass) FROM $wpdb->users WHERE user_login = '$username'");
-				if ($password) {
-					// User is authorized; now force WordPress to use the generated password
+				$row = $wpdb->get_row("SELECT ID, user_login, user_pass FROM $wpdb->users WHERE user_login = '$username'");
+				if ($row and $username == $row->user_login) {
+					// Feed WordPress a double-MD5 hash (MD5 of value generated in check_passwords)
+					$password = md5($row->user_pass);
+
+					// User is now authorized; force WordPress to use the generated password
 					$using_cookie = true;
-					wp_setcookie($username, $password, $using_cookie);
+					wp_setcookie($row->user_login, $password, $using_cookie);
 				}
 				else {
 					// User is not in the WordPress database, and thus not authorized
