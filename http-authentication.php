@@ -1,16 +1,18 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 1.3
+Version: 1.4
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/http-authentication-plugin/
-Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated (as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>).
+Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
 Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
 
+if (isset($_GET['activate']) and $_GET['activate'] == 'true') {
+	add_action('init', array('HTTPAuthentication', 'init'));
+}
 add_action('admin_menu', array('HTTPAuthentication', 'admin_menu'));
 add_action('wp_authenticate', array('HTTPAuthentication', 'authenticate'), 10, 2);
-add_action('wp_login', array('HTTPAuthentication', 'login'));
 add_action('wp_logout', array('HTTPAuthentication', 'logout'));
 add_action('lost_password', array('HTTPAuthentication', 'disable_function'));
 add_action('retrieve_password', array('HTTPAuthentication', 'disable_function'));
@@ -18,57 +20,28 @@ add_action('password_reset', array('HTTPAuthentication', 'disable_function'));
 add_action('check_passwords', array('HTTPAuthentication', 'check_passwords'), 10, 3);
 add_filter('show_password_fields', array('HTTPAuthentication', 'show_password_fields'));
 
-
-if (is_plugin_page()) {
-	$logout_uri = HTTPAuthentication::get_logout_uri();
-?>
-<div class="wrap">
-  <h2>HTTP Authentication Options</h2>
-  <form name="httpauthenticationoptions" method="post" action="options.php">
-    <input type="hidden" name="action" value="update" />
-    <input type="hidden" name="page_options" value="'http_authentication_logout_uri'" />
-    <fieldset class="options">
-      <label for="http_authentication_logout_uri">Logout URI</label>
-      <input name="http_authentication_logout_uri" type="text" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" />
-    </fieldset>
-    <p class="submit">
-      <input type="submit" name="Submit" value="Update Options &raquo;" />
-    </p>
-  </form>
-</div>
-<?php
-}
-
 if (! class_exists('HTTPAuthentication')) {
 	class HTTPAuthentication {
+		/*
+		 * Plugin hooks
+		 */
+
+		/*
+		 * Add options for this plugin to the database.
+		 */
+		function init() {
+			if (current_user_can('manage_options')) {
+				add_option('http_authentication_logout_uri', get_settings('siteurl'), 'The URI to which the user is redirected when she chooses "Logout".');
+			}
+		}
+
 		/*
 		 * Add an options pane for this plugin.
 		 */
 		function admin_menu() {
-			add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__);
-		}
-
-		/*
-		 * Return the logout URI from the database, creating the option
-		 * if it doesn't exist.
-		 */
-		function get_logout_uri() {
-			global $cache_nonexistantoptions;
-
-			$logout_uri = get_settings('http_authentication_logout_uri');
-			if (! $logout_uri or $cache_nonexistantoptions['http_authentication_logout_uri']) {
-				$logout_uri = get_settings('siteurl');
-				HTTPAuthentication::add_logout_uri_option($logout_uri);
+			if (function_exists('add_options_page')) {
+				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array('HTTPAuthentication', 'display_options_page'));
 			}
-
-			return $logout_uri;
-		}
-
-		/*
-		 * Add the logout URI option to the database.
-		 */
-		function add_logout_uri_option($logout_uri) {
-			add_option('http_authentication_logout_uri', $logout_uri, 'The URI to which the user is redirected when she chooses "Logout".');
 		}
 
 		/*
@@ -101,24 +74,10 @@ if (! class_exists('HTTPAuthentication')) {
 		}
 
 		/*
-		 * Once WordPress has verified the login, set the redirect
-		 * target appropriately. This is done because wp-login.php never
-		 * sees a POST with the correct redirect_to variable, which
-		 * breaks plugins like registered-only.
-		 */
-		function login($username) {
-			global $redirect_to;
-
-			if (! empty($_REQUEST['redirect_to'])) {
-				$redirect_to = preg_replace('|[^a-z0-9-~+_.?#=&;,/:]|i', '', $_REQUEST['redirect_to']);
-			}
-		}
-
-		/*
 		 * Logout the user by redirecting them to the logout URI.
 		 */
 		function logout() {
-			header('Location: ' . HTTPAuthentication::get_logout_uri());
+			header('Location: ' . get_settings('http_authentication_logout_uri'));
 			exit();
 		}
 
@@ -132,6 +91,14 @@ if (! class_exists('HTTPAuthentication')) {
 		}
 
 		/*
+		 * Used to disable certain display elements, e.g. password
+		 * fields on profile screen.
+		 */
+		function show_password_fields($show_password_fields) {
+			return false;
+		}
+
+		/*
 		 * Used to disable certain login functions, e.g. retrieving a
 		 * user's password.
 		 */
@@ -139,12 +106,32 @@ if (! class_exists('HTTPAuthentication')) {
 			die('Disabled');
 		}
 
+
 		/*
-		 * Used to disable certain display elements, e.g. password
-		 * fields on profile screen.
+		 * Functions
 		 */
-		function show_password_fields($show_password_fields) {
-			return false;
+
+		/*
+		 * Display the options for this plugin.
+		 */
+		function display_options_page() {
+			$logout_uri = get_option('http_authentication_logout_uri');
+?>
+<div class="wrap">
+  <h2>HTTP Authentication Options</h2>
+  <form name="httpauthenticationoptions" method="post" action="options.php">
+    <input type="hidden" name="action" value="update" />
+    <input type="hidden" name="page_options" value="http_authentication_logout_uri" />
+    <fieldset class="options">
+      <label for="http_authentication_logout_uri">Logout URI</label>
+      <input name="http_authentication_logout_uri" type="text" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" />
+    </fieldset>
+    <p class="submit">
+      <input type="submit" name="Submit" value="Update Options &raquo;" />
+    </p>
+  </form>
+</div>
+<?php
 		}
 	}
 }

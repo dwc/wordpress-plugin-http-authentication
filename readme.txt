@@ -4,12 +4,14 @@ Contributors: dwc
 
 The HTTP Authentication plugin allows you to use existing means of authenticating people to WordPress. This includes Apache's basic HTTP authentication module and many others.
 
+This version works with WordPress 2.0 and above. Use <a href="http://svn.wp-plugins.org/http-authentication/tags/1.3/">version 1.3</a> if you are using WordPress 1.5.2.
+
 == Installation ==
 
 1. Login as an existing user, such as admin.
 2. Upload `http-authentication.php` to your plugins folder, usually `wp-content/plugins`.
 3. Activate the plugin on the Plugins screen.
-4. Add one or more users to WordPress, specifying the external username for the Nickname field. Also be sure to set the level for each user.
+4. Add one or more users to WordPress, specifying the external username for the Nickname field. Also be sure to set the role for each user.
 5. Logout.
 6. Protect `wp-login.php` and `wp-admin` using your external authentication (using, for example, `.htaccess` files).
 7. Try logging in as one of the users added in step 4.
