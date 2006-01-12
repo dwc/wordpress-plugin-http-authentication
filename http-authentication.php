@@ -77,7 +77,7 @@ if (! class_exists('HTTPAuthentication')) {
 				}
 			}
 			else {
-				die("No REMOTE_USER found");
+				die("No REMOTE_USER found; please check your external authentication configuration");
 			}
 		}
 
