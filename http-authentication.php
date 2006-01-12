@@ -54,22 +54,30 @@ if (! class_exists('HTTPAuthentication')) {
 			// Reset values from input ($_POST and $_COOKIE)
 			$username = $password = '';
 
-			if ($_SERVER['REMOTE_USER']) {
-				$username = $_SERVER['REMOTE_USER'];
+			if (! empty($_SERVER['REMOTE_USER'])) {
+				if (function_exists('get_userdatabylogin')) {
+					$username = $_SERVER['REMOTE_USER'];
 
-				$row = $wpdb->get_row("SELECT ID, user_login, user_pass FROM $wpdb->users WHERE user_login = '$username'");
-				if ($row and $username == $row->user_login) {
-					// Feed WordPress a double-MD5 hash (MD5 of value generated in check_passwords)
-					$password = md5($row->user_pass);
+					$user = get_userdatabylogin($username);
+					if ($user and $username == $user->user_login) {
+						// Feed WordPress a double-MD5 hash (MD5 of value generated in check_passwords)
+						$password = md5($user->user_pass);
 
-					// User is now authorized; force WordPress to use the generated password
-					$using_cookie = true;
-					wp_setcookie($row->user_login, $password, $using_cookie);
+						// User is now authorized; force WordPress to use the generated password
+						$using_cookie = true;
+						wp_setcookie($user->user_login, $password, $using_cookie);
+					}
+					else {
+						// User is not in the WordPress database, and thus not authorized
+						$username = $password = '';
+					}
 				}
 				else {
-					// User is not in the WordPress database, and thus not authorized
-					$username = $password = '';
+					die("Could not load user data");
 				}
+			}
+			else {
+				die("No REMOTE_USER found");
 			}
 		}
 
