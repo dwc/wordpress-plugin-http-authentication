@@ -49,7 +49,7 @@ if (! class_exists('HTTPAuthentication')) {
 		 * This assumes that you have externally authenticated the user.
 		 */
 		function authenticate($username, $password) {
-			global $using_cookie, $wpdb;
+			global $using_cookie;
 
 			// Reset values from input ($_POST and $_COOKIE)
 			$username = $password = '';
