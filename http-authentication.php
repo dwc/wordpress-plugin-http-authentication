@@ -31,7 +31,7 @@ if (! class_exists('HTTPAuthentication')) {
 		 */
 		function init() {
 			if (current_user_can('manage_options')) {
-				add_option('http_authentication_logout_uri', get_settings('siteurl'), 'The URI to which the user is redirected when she chooses "Logout".');
+				add_option('http_authentication_logout_uri', get_option('siteurl'), 'The URI to which the user is redirected when she chooses "Logout".');
 			}
 		}
 
@@ -85,7 +85,7 @@ if (! class_exists('HTTPAuthentication')) {
 		 * Logout the user by redirecting them to the logout URI.
 		 */
 		function logout() {
-			header('Location: ' . get_settings('http_authentication_logout_uri'));
+			header('Location: ' . get_option('http_authentication_logout_uri'));
 			exit();
 		}
 
