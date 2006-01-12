@@ -31,7 +31,7 @@ if (! class_exists('HTTPAuthentication')) {
 		 */
 		function init() {
 			if (current_user_can('manage_options')) {
-				add_option('http_authentication_logout_uri', get_option('siteurl'), 'The URI to which the user is redirected when she chooses "Logout".');
+				add_option('http_authentication_logout_uri', get_option('home'), 'The URI to which the user is redirected when she chooses "Logout".');
 			}
 		}
 
