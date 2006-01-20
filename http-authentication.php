@@ -72,7 +72,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 					}
 					else {
 						// User is not in the WordPress database, and thus not authorized
-						$username = $password = '';
+						die("User $username does not exist in the WordPress database");
 					}
 				}
 				else {
@@ -134,8 +134,15 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
     <input type="hidden" name="action" value="update" />
     <input type="hidden" name="page_options" value="http_authentication_logout_uri" />
     <fieldset class="options">
-      <label for="http_authentication_logout_uri">Logout URI</label>
-      <input name="http_authentication_logout_uri" type="text" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" />
+      <table class="editform optiontable">
+        <tr valign="top">
+          <th scope="row"><label for="http_authentication_logout_uri">Logout URI</label></th>
+          <td>
+            <input type="text" name="http_authentication_logout_uri" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
+            Default is <code><?php echo htmlspecialchars(get_settings('home')); ?></code>; override to e.g. remove a cookie
+          </td>
+        </tr>
+      </table>
     </fieldset>
     <p class="submit">
       <input type="submit" name="Submit" value="Update Options &raquo;" />
