@@ -1,30 +1,33 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 1.4
+Version: 1.5
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/http-authentication-plugin/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
 Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
 
-if (isset($_GET['activate']) and $_GET['activate'] == 'true') {
-	add_action('init', array('HTTPAuthentication', 'init'));
-}
-add_action('admin_menu', array('HTTPAuthentication', 'admin_menu'));
-add_action('wp_authenticate', array('HTTPAuthentication', 'authenticate'), 10, 2);
-add_action('wp_logout', array('HTTPAuthentication', 'logout'));
-add_action('lost_password', array('HTTPAuthentication', 'disable_function'));
-add_action('retrieve_password', array('HTTPAuthentication', 'disable_function'));
-add_action('password_reset', array('HTTPAuthentication', 'disable_function'));
-add_action('check_passwords', array('HTTPAuthentication', 'check_passwords'), 10, 3);
-add_filter('show_password_fields', array('HTTPAuthentication', 'show_password_fields'));
+if (! class_exists('HTTPAuthenticationPlugin')) {
+	class HTTPAuthenticationPlugin {
+		function HTTPAuthenticationPlugin() {
+			if (isset($_GET['activate']) and $_GET['activate'] == 'true') {
+				add_action('init', array(&$this, 'init'));
+			}
+			add_action('admin_menu', array(&$this, 'admin_menu'));
+			add_action('wp_authenticate', array(&$this, 'authenticate'), 10, 2);
+			add_action('wp_logout', array(&$this, 'logout'));
+			add_action('lost_password', array(&$this, 'disable_function'));
+			add_action('retrieve_password', array(&$this, 'disable_function'));
+			add_action('password_reset', array(&$this, 'disable_function'));
+			add_action('check_passwords', array(&$this, 'check_passwords'), 10, 3);
+			add_filter('show_password_fields', array(&$this, 'show_password_fields'));
+		}
 
-if (! class_exists('HTTPAuthentication')) {
-	class HTTPAuthentication {
-		/*
+
+		/*************************************************************
 		 * Plugin hooks
-		 */
+		 *************************************************************/
 
 		/*
 		 * Add options for this plugin to the database.
@@ -40,7 +43,7 @@ if (! class_exists('HTTPAuthentication')) {
 		 */
 		function admin_menu() {
 			if (function_exists('add_options_page')) {
-				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array('HTTPAuthentication', 'display_options_page'));
+				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, 'display_options_page'));
 			}
 		}
 
@@ -115,9 +118,9 @@ if (! class_exists('HTTPAuthentication')) {
 		}
 
 
-		/*
+		/*************************************************************
 		 * Functions
-		 */
+		 *************************************************************/
 
 		/*
 		 * Display the options for this plugin.
@@ -143,4 +146,7 @@ if (! class_exists('HTTPAuthentication')) {
 		}
 	}
 }
+
+// Load the plugin hooks, etc.
+$http_authentication_plugin = new HTTPAuthenticationPlugin();
 ?>
