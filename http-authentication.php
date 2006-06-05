@@ -130,9 +130,11 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 ?>
 <div class="wrap">
   <h2>HTTP Authentication Options</h2>
-  <form name="httpauthenticationoptions" method="post" action="options.php">
+  <form action="options.php" method="post">
     <input type="hidden" name="action" value="update" />
     <input type="hidden" name="page_options" value="http_authentication_logout_uri" />
+    <?php if (function_exists('wp_nonce_field')): wp_nonce_field('update-options'); endif; ?>
+
     <fieldset class="options">
       <table class="editform optiontable">
         <tr valign="top">
