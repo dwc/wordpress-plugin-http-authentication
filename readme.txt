@@ -1,10 +1,15 @@
 === HTTP Authentication ===
-Tags: authentication
 Contributors: dwc
+Tags: authentication
+Requires at least: 2.0
+Tested up to: 2.2
+Stable tag: trunk
+
+Use an external authentication source in WordPress.
+
+== Description ==
 
 The HTTP Authentication plugin allows you to use existing means of authenticating people to WordPress. This includes Apache's basic HTTP authentication module and many others.
-
-This version works with WordPress 2.0 and above. Use <a href="http://svn.wp-plugins.org/http-authentication/tags/1.3/">version 1.3</a> if you are using WordPress 1.5.2.
 
 == Installation ==
 
@@ -15,6 +20,8 @@ This version works with WordPress 2.0 and above. Use <a href="http://svn.wp-plug
 5. Logout.
 6. Protect `wp-login.php` and `wp-admin` using your external authentication (using, for example, `.htaccess` files).
 7. Try logging in as one of the users added in step 4.
+
+Note: This version works with WordPress 2.0 and above. Use <a href="http://svn.wp-plugins.org/http-authentication/tags/1.3/">version 1.3</a> if you are using WordPress 1.5.2.
 
 == Frequently Asked Questions ==
 
