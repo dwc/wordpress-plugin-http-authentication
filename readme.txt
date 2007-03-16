@@ -21,7 +21,7 @@ The HTTP Authentication plugin allows you to use existing means of authenticatin
 6. Protect `wp-login.php` and `wp-admin` using your external authentication (using, for example, `.htaccess` files).
 7. Try logging in as one of the users added in step 4.
 
-Note: This version works with WordPress 2.0 and above. Use <a href="http://svn.wp-plugins.org/http-authentication/tags/1.3/">version 1.3</a> if you are using WordPress 1.5.2.
+Note: This version works with WordPress 2.0 and above. Use [version 1.3](http://downloads.wordpress.org/plugin/http-authentication.1.3.zip) if you are using WordPress 1.5.2.
 
 == Frequently Asked Questions ==
 
@@ -55,7 +55,7 @@ In both files, be sure to set `/path/to/passwords` to the location of your passw
 
 = Where can I find more information on configuring Apache authentication? =
 
-See Apache's HOWTO: <a href="http://httpd.apache.org/docs/howto/auth.html">Authentication, Authorization, and Access Control</a>.
+See Apache's HOWTO: [Authentication, Authorization, and Access Control](http://httpd.apache.org/docs/howto/auth.html).
 
 = How does this plugin authenticate users? =
 
@@ -71,4 +71,4 @@ Because this plugin generates a random password when you create a new user or ed
 
 Also, you should leave the `admin` user as a fallback, i.e. create a new account to use with this plugin. As long as you don't edit the `admin` profile, WordPress will store the password set when you installed WordPress.
 
-In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to <a href="http://codex.wordpress.org/Resetting_Your_Password">reset a user's password</a>.
+In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to [reset a user's password](http://codex.wordpress.org/Resetting_Your_Password).
