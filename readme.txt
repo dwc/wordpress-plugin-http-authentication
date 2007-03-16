@@ -3,7 +3,7 @@ Contributors: dwc
 Tags: authentication
 Requires at least: 2.0
 Tested up to: 2.2
-Stable tag: trunk
+Stable tag: 1.7
 
 Use an external authentication source in WordPress.
 
