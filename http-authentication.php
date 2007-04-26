@@ -35,7 +35,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		function init() {
 			if (current_user_can('manage_options')) {
 				add_option('http_authentication_logout_uri', get_option('home'), 'The URI to which the user is redirected when she chooses "Logout".');
-				add_option('http_authentication_auto_create_user', '0', 'Should a new user be created automatically if not already in the WordPress database?');
+				add_option('http_authentication_auto_create_user', false, 'Should a new user be created automatically if not already in the WordPress database?');
 				add_option('http_authentication_auto_create_email_domain', '', 'The domain to use for the email address of an automatically created user.');
 			}
 		}
@@ -134,7 +134,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * Generate a random password.
 		 */
 		function get_password($length = 10) {
-			return substr(md5(uniqid(microtime())), 0, 10);
+			return substr(md5(uniqid(microtime())), 0, $length);
 		}
 
 		/*
