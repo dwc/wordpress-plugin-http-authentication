@@ -154,34 +154,32 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
     <input type="hidden" name="page_options" value="http_authentication_logout_uri,http_authentication_auto_create_user,http_authentication_auto_create_email_domain" />
     <?php if (function_exists('wp_nonce_field')): wp_nonce_field('update-options'); endif; ?>
 
-    <fieldset class="options">
-      <table class="editform optiontable">
-        <tr valign="top">
-          <th scope="row"><label for="http_authentication_logout_uri">Logout URI</label></th>
-          <td>
-            <input type="text" name="http_authentication_logout_uri" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-            Default is <code><?php echo htmlspecialchars(get_settings('home')); ?></code>; override to e.g. remove a cookie.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th scope="row"><label for="http_authentication_auto_create_user">Automatically create accounts?</label></th>
-          <td>
-            <input type="checkbox" name="http_authentication_auto_create_user" id="http_authentication_auto_create_user"<?php if ($auto_create_user) echo ' checked="checked"' ?> value="1" /><br />
-            Should a new user be created automatically if not already in the WordPress database?<br />
-            Created users will obtain the role defined under &quot;New User Default Role&quot; on the <a href="options-general.php">General Options</a> page.
-          </td>
-        </tr>
-        <tr valign="top">
-          <th scope="row"><label for="http_authentication_auto_create_email_domain">Email address domain</label></th>
-          <td>
-            <input type="text" name="http_authentication_auto_create_email_domain" id="http_authentication_auto_create_email_domain" value="<?php echo htmlspecialchars($auto_create_email_domain) ?>" size="50" /><br />
-            When a new user logs in, this domain is used for the initial email address on their account. The user can change his or her email address by editing their profile.
-          </td>
-        </tr>
-      </table>
-    </fieldset>
+    <table class="form-table">
+      <tr valign="top">
+        <th scope="row"><label for="http_authentication_logout_uri">Logout URI</label></th>
+        <td>
+          <input type="text" name="http_authentication_logout_uri" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
+          Default is <code><?php echo htmlspecialchars(get_settings('home')); ?></code>; override to e.g. remove a cookie.
+        </td>
+      </tr>
+      <tr valign="top">
+        <th scope="row"><label for="http_authentication_auto_create_user">Automatically create accounts?</label></th>
+        <td>
+          <input type="checkbox" name="http_authentication_auto_create_user" id="http_authentication_auto_create_user"<?php if ($auto_create_user) echo ' checked="checked"' ?> value="1" /><br />
+          Should a new user be created automatically if not already in the WordPress database?<br />
+          Created users will obtain the role defined under &quot;New User Default Role&quot; on the <a href="options-general.php">General Options</a> page.
+        </td>
+      </tr>
+      <tr valign="top">
+        <th scope="row"><label for="http_authentication_auto_create_email_domain">Email address domain</label></th>
+        <td>
+          <input type="text" name="http_authentication_auto_create_email_domain" id="http_authentication_auto_create_email_domain" value="<?php echo htmlspecialchars($auto_create_email_domain) ?>" size="50" /><br />
+          When a new user logs in, this domain is used for the initial email address on their account. The user can change his or her email address by editing their profile.
+        </td>
+      </tr>
+    </table>
     <p class="submit">
-      <input type="submit" name="Submit" value="Update Options &raquo;" />
+      <input type="submit" name="Submit" value="Save Changes" />
     </p>
   </form>
 </div>
