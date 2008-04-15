@@ -12,17 +12,17 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 	class HTTPAuthenticationPlugin {
 		function HTTPAuthenticationPlugin() {
 			if (isset($_GET['activate']) and $_GET['activate'] == 'true') {
-				add_action('init', array(&$this, 'init'));
+				add_action('init', array(&$this, 'initialize_options'));
 			}
-			add_action('admin_menu', array(&$this, 'admin_menu'));
+			add_action('admin_menu', array(&$this, 'add_options_page'));
 			add_action('wp_authenticate', array(&$this, 'authenticate'), 10, 2);
 			add_filter('check_password', array(&$this, 'skip_password_check'), 10, 4);
 			add_action('wp_logout', array(&$this, 'logout'));
 			add_action('lost_password', array(&$this, 'disable_function'));
 			add_action('retrieve_password', array(&$this, 'disable_function'));
 			add_action('password_reset', array(&$this, 'disable_function'));
-			add_action('check_passwords', array(&$this, 'check_passwords'), 10, 3);
-			add_filter('show_password_fields', array(&$this, 'show_password_fields'));
+			add_action('check_passwords', array(&$this, 'generate_password'), 10, 3);
+			add_filter('show_password_fields', array(&$this, 'disable_password_fields'));
 		}
 
 
@@ -33,7 +33,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		/*
 		 * Add options for this plugin to the database.
 		 */
-		function init() {
+		function initialize_options() {
 			if (current_user_can('manage_options')) {
 				add_option('http_authentication_logout_uri', get_option('home'), 'The URI to which the user is redirected when she chooses "Logout".');
 				add_option('http_authentication_auto_create_user', false, 'Should a new user be created automatically if not already in the WordPress database?');
@@ -44,9 +44,9 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		/*
 		 * Add an options pane for this plugin.
 		 */
-		function admin_menu() {
+		function add_options_page() {
 			if (function_exists('add_options_page')) {
-				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, 'display_options_page'));
+				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, '_display_options_page'));
 			}
 		}
 
@@ -61,13 +61,13 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 
 			// Fake WordPress into authenticating by overriding the credentials
 			$username = $_SERVER['REMOTE_USER'];
-			$password = $this->get_password();
+			$password = $this->_get_password();
 
 			// Create new users automatically, if configured
 			$user = get_userdatabylogin($username);
 			if (! $user or $user->user_login != $username) {
 				if ((bool) get_option('http_authentication_auto_create_user')) {
-					$this->create_user($username);
+					$this->_create_user($username);
 				}
 				else {
 					// Bail out to avoid showing the login form
@@ -96,15 +96,15 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * require the user to enter this value, but we want to set it
 		 * to something nonobvious.
 		 */
-		function check_passwords($username, $password1, $password2) {
-			$password1 = $password2 = $this->get_password();
+		function generate_password($username, $password1, $password2) {
+			$password1 = $password2 = $this->_get_password();
 		}
 
 		/*
 		 * Used to disable certain display elements, e.g. password
 		 * fields on profile screen.
 		 */
-		function show_password_fields($show_password_fields) {
+		function disable_password_fields($show_password_fields) {
 			return false;
 		}
 
@@ -124,15 +124,15 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		/*
 		 * Generate a random password.
 		 */
-		function get_password($length = 10) {
+		function _get_password($length = 10) {
 			return substr(md5(uniqid(microtime())), 0, $length);
 		}
 
 		/*
 		 * Create a new WordPress account for the specified username.
 		 */
-		function create_user($username) {
-			$password = $this->get_password();
+		function _create_user($username) {
+			$password = $this->_get_password();
 			$email_domain = get_option('http_authentication_auto_create_email_domain');
 
 			require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
@@ -142,7 +142,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		/*
 		 * Display the options for this plugin.
 		 */
-		function display_options_page() {
+		function _display_options_page() {
 			$logout_uri = get_option('http_authentication_logout_uri');
 			$auto_create_user = (bool) get_option('http_authentication_auto_create_user');
 			$auto_create_email_domain = get_option('http_authentication_auto_create_email_domain');
