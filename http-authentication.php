@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 1.8
+Version: 2.0
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/http-authentication-plugin/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -16,6 +16,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 			}
 			add_action('admin_menu', array(&$this, 'admin_menu'));
 			add_action('wp_authenticate', array(&$this, 'authenticate'), 10, 2);
+			add_filter('check_password', array(&$this, 'skip_password_check'), 10, 4);
 			add_action('wp_logout', array(&$this, 'logout'));
 			add_action('lost_password', array(&$this, 'disable_function'));
 			add_action('retrieve_password', array(&$this, 'disable_function'));
@@ -54,42 +55,32 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * This assumes that you have externally authenticated the user.
 		 */
 		function authenticate($username, $password) {
-			global $using_cookie;
+			if (empty($_SERVER['REMOTE_USER'])) {
+				die('No REMOTE_USER found; please check your external authentication configuration');
+			}
 
-			// Reset values from input ($_POST and $_COOKIE)
-			$username = $password = '';
+			// Fake WordPress into authenticating by overriding the credentials
+			$username = $_SERVER['REMOTE_USER'];
+			$password = $this->get_password();
 
-			if (! empty($_SERVER['REMOTE_USER'])) {
-				if (function_exists('get_userdatabylogin')) {
-					$username = $_SERVER['REMOTE_USER'];
-					$user = get_userdatabylogin($username);
-
-					if (! $user or $username != $user->user_login) {
-						if ((bool) get_option('http_authentication_auto_create_user')) {
-							// Create user and re-read from database for login (next step)
-							$this->create_user($username);
-							$user = get_userdatabylogin($username);
-						}
-						else {
-							// User is not in the WordPress database, and thus not authorized
-							die("User $username does not exist in the WordPress database");
-						}
-					}
-
-					// Login the user by feeding WordPress a double-MD5 hash
-					$password = md5($user->user_pass);
-
-					// User is now authorized; force WordPress to use the generated password
-					$using_cookie = true;
-					wp_setcookie($user->user_login, $password, $using_cookie);
+			// Create new users automatically, if configured
+			$user = get_userdatabylogin($username);
+			if (! $user or $user->user_login != $username) {
+				if ((bool) get_option('http_authentication_auto_create_user')) {
+					$this->create_user($username);
 				}
 				else {
-					die("Could not load user data");
+					// Bail out to avoid showing the login form
+					die("User $username does not exist in the WordPress database");
 				}
 			}
-			else {
-				die("No REMOTE_USER found; please check your external authentication configuration");
-			}
+		}
+
+		/*
+		 * Skip the password check, since we've externally authenticated.
+		 */
+		function skip_password_check($check, $password, $hash, $user_id) {
+			return true;
 		}
 
 		/*
