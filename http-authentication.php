@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 2.0
+Version: 2.1
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2008/04/16/http-authentication-20/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -136,7 +136,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 			$email_domain = get_option('http_authentication_auto_create_email_domain');
 
 			require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
-			wp_create_user($username, $password, $username . '@' . $email_domain);
+			wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
 		}
 
 		/*
