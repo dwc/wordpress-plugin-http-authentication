@@ -159,7 +159,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
         <th scope="row"><label for="http_authentication_logout_uri">Logout URI</label></th>
         <td>
           <input type="text" name="http_authentication_logout_uri" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-          Default is <code><?php echo htmlspecialchars(get_settings('home')); ?></code>; override to e.g. remove a cookie.
+          Default is <code><?php echo htmlspecialchars(get_option('home')); ?></code>; override to e.g. remove a cookie.
         </td>
       </tr>
       <tr valign="top">
