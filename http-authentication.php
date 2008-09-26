@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 2.1
+Version: 2.2
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2008/04/16/http-authentication-20/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -51,16 +51,23 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		}
 
 		/*
-		 * If the REMOTE_USER evironment is set, use it as the username.
-		 * This assumes that you have externally authenticated the user.
+		 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment
+		 * variable is set, use it as the username. This assumes that
+		 * you have externally authenticated the user.
 		 */
 		function authenticate($username, $password) {
-			if (empty($_SERVER['REMOTE_USER'])) {
-				die('No REMOTE_USER found; please check your external authentication configuration');
+			$username = '';
+			if (isset($_SERVER['REMOTE_USER'])) {
+				$username = $_SERVER['REMOTE_USER'];
+			}
+			elseif (isset($_SERVER['REDIRECT_REMOTE_USER'])) {
+				$username = $_SERVER['REDIRECT_REMOTE_USER'];
+			}
+			else {
+				die('No REMOTE_USER or REDIRECT_REMOTE_USER found; please check your external authentication configuration');
 			}
 
 			// Fake WordPress into authenticating by overriding the credentials
-			$username = $_SERVER['REMOTE_USER'];
 			$password = $this->_get_password();
 
 			// Create new users automatically, if configured
