@@ -3,7 +3,7 @@ Contributors: dwc
 Tags: authentication
 Requires at least: 2.5.1
 Tested up to: 2.6.2
-Stable tag: 2.1
+Stable tag: 2.2
 
 Use an external authentication source in WordPress.
 
@@ -27,7 +27,7 @@ Note: This version works with WordPress 2.5.1 and above. Use [version 1.8](http:
 
 = What authentication mechanisms can I use? =
 
-Any authentication mechanism which sets the `REMOTE_USER` environment variable can be used in conjunction with this plugin. Examples include Apache's `mod_auth` and `mod_auth_ldap`.
+Any authentication mechanism which sets the `REMOTE_USER` (or `REDIRECT_REMOTE_USER`, in the case of ScriptAlias'd PHP-as-CGI) environment variable can be used in conjunction with this plugin. Examples include Apache's `mod_auth` and `mod_auth_ldap`.
 
 = How should I set up external authentication? =
 
@@ -61,7 +61,7 @@ See Apache's HOWTO: [Authentication, Authorization, and Access Control](http://h
 
 This plugin doesn't actually authenticate users. It simply feeds WordPress the name of a user who has successfully authenticated through Apache.
 
-To determine the username, this plugin uses the `REMOTE_USER` environment variable, which is set by many Apache authentication modules. If someone can find a way to spoof this value, this plugin is not guaranteed to be secure.
+To determine the username, this plugin uses the `REMOTE_USER` or the `REDIRECT_REMOTE_USER` environment variable, which is set by many Apache authentication modules. If someone can find a way to spoof this value, this plugin is not guaranteed to be secure.
 
 This plugin generates a random password each time you create a user or edit an existing user's profile. However, since this plugin requires an external authentication mechanism, this password is not requested by WordPress. Generating a random password helps protect accounts, preventing one authorized user from pretending to be another.
 
