@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 1.8
+Version: 1.8.1
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/http-authentication-plugin/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -57,38 +57,43 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 			global $using_cookie;
 
 			// Reset values from input ($_POST and $_COOKIE)
-			$username = $password = '';
-
-			if (! empty($_SERVER['REMOTE_USER'])) {
-				if (function_exists('get_userdatabylogin')) {
-					$username = $_SERVER['REMOTE_USER'];
-					$user = get_userdatabylogin($username);
-
-					if (! $user or $username != $user->user_login) {
-						if ((bool) get_option('http_authentication_auto_create_user')) {
-							// Create user and re-read from database for login (next step)
-							$this->create_user($username);
-							$user = get_userdatabylogin($username);
-						}
-						else {
-							// User is not in the WordPress database, and thus not authorized
-							die("User $username does not exist in the WordPress database");
-						}
-					}
-
-					// Login the user by feeding WordPress a double-MD5 hash
-					$password = md5($user->user_pass);
-
-					// User is now authorized; force WordPress to use the generated password
-					$using_cookie = true;
-					wp_setcookie($user->user_login, $password, $using_cookie);
-				}
-				else {
-					die("Could not load user data");
-				}
+			$username = '';
+			if (isset($_SERVER['REMOTE_USER'])) {
+				$username = $_SERVER['REMOTE_USER'];
+			}
+			elseif (isset($_SERVER['REDIRECT_REMOTE_USER'])) {
+				$username = $_SERVER['REDIRECT_REMOTE_USER'];
 			}
 			else {
-				die("No REMOTE_USER found; please check your external authentication configuration");
+				die('No REMOTE_USER or REDIRECT_REMOTE_USER found; please check your external authentication configuration');
+			}
+
+			$password = '';
+
+			if (function_exists('get_userdatabylogin')) {
+				$user = get_userdatabylogin($username);
+
+				if (! $user or $username != $user->user_login) {
+					if ((bool) get_option('http_authentication_auto_create_user')) {
+						// Create user and re-read from database for login (next step)
+						$this->create_user($username);
+						$user = get_userdatabylogin($username);
+					}
+					else {
+						// User is not in the WordPress database, and thus not authorized
+						die("User $username does not exist in the WordPress database");
+					}
+				}
+
+				// Login the user by feeding WordPress a double-MD5 hash
+				$password = md5($user->user_pass);
+
+				// User is now authorized; force WordPress to use the generated password
+				$using_cookie = true;
+				wp_setcookie($user->user_login, $password, $using_cookie);
+			}
+			else {
+				die("Could not load user data");
 			}
 		}
 
