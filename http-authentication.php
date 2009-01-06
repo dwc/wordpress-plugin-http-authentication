@@ -11,9 +11,8 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 if (! class_exists('HTTPAuthenticationPlugin')) {
 	class HTTPAuthenticationPlugin {
 		function HTTPAuthenticationPlugin() {
-			if (isset($_GET['activate']) and $_GET['activate'] == 'true') {
-				add_action('init', array(&$this, 'initialize_options'));
-			}
+			register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
+
 			add_action('admin_menu', array(&$this, 'add_options_page'));
 			add_action('wp_authenticate', array(&$this, 'authenticate'), 10, 2);
 			add_filter('check_password', array(&$this, 'skip_password_check'), 10, 4);
