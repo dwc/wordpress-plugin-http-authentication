@@ -2,7 +2,7 @@
 Contributors: dwc
 Tags: authentication
 Requires at least: 2.5.1
-Tested up to: 2.7
+Tested up to: 2.8.4
 Stable tag: 2.3
 
 Use an external authentication source in WordPress.
@@ -22,6 +22,8 @@ The HTTP Authentication plugin allows you to use existing means of authenticatin
 7. Try logging in as one of the users added in step 4.
 
 Note: This version works with WordPress 2.5.1 and above. Use [version 1.8](http://downloads.wordpress.org/plugin/http-authentication.1.8.zip) if you are using WordPress 2.0.
+
+This plugin also supports WordPress MU as of version 2.4. You can install it globally or on a per-site basis. Refer to the WordPress MU documentation for more information on installing plugins.
 
 == Frequently Asked Questions ==
 
@@ -72,3 +74,9 @@ Because this plugin generates a random password when you create a new user or ed
 Also, you should leave the `admin` user as a fallback, i.e. create a new account to use with this plugin. As long as you don't edit the `admin` profile, WordPress will store the password set when you installed WordPress.
 
 In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to [reset a user's password](http://codex.wordpress.org/Resetting_Your_Password).
+
+== Changelog ==
+
+= 2.4 =
+* Add support for WordPress MU (Elliot Kendall)
+* Allow for mixed HTTP and built-in authentication by falling back to wp-login.php (Elliot Kendall)
