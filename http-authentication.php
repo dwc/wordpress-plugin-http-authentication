@@ -96,7 +96,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 
 			// Create new users automatically, if configured
 			$user = get_userdatabylogin($username);
-			if (! $user or $user->user_login != $username) {
+			if (! $user) {
 				if ((bool) $this->get_option('http_authentication_auto_create_user')) {
 					$this->_create_user($username);
 				}
