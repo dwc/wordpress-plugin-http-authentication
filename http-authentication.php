@@ -9,10 +9,7 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
 
 if (! class_exists('HTTPAuthenticationPlugin')) {
-
 	class HTTPAuthenticationPlugin {
-		var $wpmu;
-
 		function HTTPAuthenticationPlugin() {
 			// Administration handlers
 			register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
@@ -23,20 +20,6 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 			// Login handlers
 			add_action('allow_password_reset', array(&$this, 'disable'));
 			add_action('wp_logout', array(&$this, 'logout'));
-
-			// WORDPRESS MU DETECTION
-			//    0 - Regular WordPress installation
-			//    1 - WordPress MU forced activation
-			//    2 - WordPress MU optional activation
-			$this->wpmu = 0;
-			if (basename(dirname(__FILE__)) == "mu-plugins") {
-				// Forced activation
-				$this->wpmu = 1;
-			}
-			else if (basename(dirname(__FILE__)) == "plugins" && function_exists('is_site_admin')) {
-				// Optional activation
-				$this->wpmu = 2;
-			}
 		}
 
 
@@ -59,14 +42,12 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * Add an options pane for this plugin.
 		 */
 		function add_options_page() {
-			if (function_exists('add_options_page')) {
-				if ($this->wpmu == 1 && function_exists('is_site_admin') && is_site_admin()) {
-					add_submenu_page('wpmu-admin.php', 'HTTP Authentication', 'HTTP Authentication', 'manage_options', __FILE__, array(&$this, '_display_options_page'));
-					add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, '_display_options_page'));
-				}
-				else if ($this->wpmu != 1) {
-					add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, '_display_options_page'));
-				}
+			if (function_exists('is_site_admin') && is_site_admin()) {
+				add_submenu_page('wpmu-admin.php', 'HTTP Authentication', 'HTTP Authentication', 'manage_options', __FILE__, array(&$this, '_display_options_page'));
+				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, '_display_options_page'));
+			}
+			else {
+				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, '_display_options_page'));
 			}
 		}
 
@@ -95,24 +76,14 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * Use the appropriate get_option function for our MU config.
 		 */
 		function get_option($option) {
-			if ($this->wpmu == 1) {
-				return get_site_option($option);
-			}
-			else {
-				return get_option($option);
-			}
+			return function_exists('get_site_option') ? get_site_option($option) : get_option($option);
 		}
 
 		/*
 		 * Use the appropriate update_option function for our MU config.
 		 */
 		function update_option($option, $value) {
-			if ($this->wpmu == 1) {
-				update_site_option($option, $value);
-			}
-			else {
-				update_option($option, $value);
-			}
+			return function_exists('update_site_option') ? update_site_option($option, $value) : update_option($option, $value);
 		}
 
 		/*
