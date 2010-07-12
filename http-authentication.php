@@ -100,6 +100,10 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 				}
 			}
 
+			if (! $username) {
+				return new WP_Error('empty_username', 'No REMOTE_USER or REDIRECT_REMOTE_USER found.');
+			}
+
 			// Create new users automatically, if configured
 			$user = get_userdatabylogin($username);
 			if (! $user) {
@@ -201,7 +205,9 @@ if (! function_exists('wp_authenticate')) {
 		global $http_authentication_plugin;
 
 		$user = $http_authentication_plugin->check_user();
-		$user = new WP_User($user->ID);
+		if (! is_wp_error($user)) {
+			$user = new WP_User($user->ID);
+		}
 
 		return $user;
 	}
