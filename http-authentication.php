@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 2.2
+Version: 3.0
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2008/04/16/http-authentication-20/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -10,32 +10,18 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 
 if (! class_exists('HTTPAuthenticationPlugin')) {
 	$wpmu;
-	$username;
-
+	
 	class HTTPAuthenticationPlugin {
 		function HTTPAuthenticationPlugin() {
+			// Administration handlers
 			register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
 
-			$this->username = '';
-			foreach (array('REMOTE_USER', 'REDIRECT_REMOTE_USER') as $key) {
-				if (isset($_SERVER[$key])) {
-					$this->username = $_SERVER[$key];
-				}
-			}
-
-			// Allow fallthrough for non-protected blogs
-			if ($this->username !== '') {
-				add_action('wp_authenticate', array(&$this, 'authenticate'), 10, 2);
-				add_filter('check_password', array(&$this, 'skip_password_check'), 10, 4);
-			}
-
 			add_action('admin_menu', array(&$this, 'add_options_page'));
+			add_filter('show_password_fields', array(&$this, 'disable'));
+
+			// Login handlers
+			add_action('allow_password_reset', array(&$this, 'disable'));
 			add_action('wp_logout', array(&$this, 'logout'));
-			add_action('lost_password', array(&$this, 'disable_function'));
-			add_action('retrieve_password', array(&$this, 'disable_function'));
-			add_action('password_reset', array(&$this, 'disable_function'));
-			add_action('check_passwords', array(&$this, 'generate_password'), 10, 3);
-			add_filter('show_password_fields', array(&$this, 'disable_password_fields'));
 
 			// WORDPRESS MU DETECTION
 			//    0 - Regular WordPress installation
@@ -84,37 +70,6 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		}
 
 		/*
-		 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment
-		 * variable is set, use it as the username. This assumes that
-		 * you have externally authenticated the user.
-		 */
-		function authenticate($username, $password) {
-			$username = $this->username;
-
-			// Fake WordPress into authenticating by overriding the credentials
-			$password = $this->_get_password();
-
-			// Create new users automatically, if configured
-			$user = get_userdatabylogin($username);
-			if (! $user) {
-				if ((bool) $this->get_option('http_authentication_auto_create_user')) {
-					$this->_create_user($username);
-				}
-				else {
-					// Bail out to avoid showing the login form
-					die("User $username does not exist in the WordPress database");
-				}
-			}
-		}
-
-		/*
-		 * Skip the password check, since we've externally authenticated.
-		 */
-		function skip_password_check($check, $password, $hash, $user_id) {
-			return true;
-		}
-
-		/*
 		 * Logout the user by redirecting them to the logout URI.
 		 */
 		function logout() {
@@ -123,28 +78,11 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		}
 
 		/*
-		 * Generate a password for the user. This plugin does not
-		 * require the user to enter this value, but we want to set it
-		 * to something nonobvious.
-		 */
-		function generate_password($username, $password1, $password2) {
-			$password1 = $password2 = $this->_get_password();
-		}
-
-		/*
 		 * Used to disable certain display elements, e.g. password
-		 * fields on profile screen.
+		 * fields on profile screen, or functions, e.g. password reset.
 		 */
-		function disable_password_fields($show_password_fields) {
+		function disable($flag) {
 			return false;
-		}
-
-		/*
-		 * Used to disable certain login functions, e.g. retrieving a
-		 * user's password.
-		 */
-		function disable_function() {
-			die('Disabled');
 		}
 
 
@@ -177,21 +115,46 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		}
 
 		/*
-		 * Generate a random password.
+		 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment
+		 * variable is set, use it as the username. This assumes that
+		 * you have externally authenticated the user.
 		 */
-		function _get_password($length = 10) {
-			return substr(md5(uniqid(microtime())), 0, $length);
+		function check_user() {
+			$username = '';
+
+			foreach (array('REMOTE_USER', 'REDIRECT_REMOTE_USER') as $key) {
+				if (isset($_SERVER[$key])) {
+					$username = $_SERVER[$key];
+				}
+			}
+
+			// Create new users automatically, if configured
+			$user = get_userdatabylogin($username);
+			if (! $user) {
+				if ((bool) $this->get_option('http_authentication_auto_create_user')) {
+					$user = $this->_create_user($username);
+				}
+				else {
+					// Bail out to avoid showing the login form
+					die("User $username does not exist in the WordPress database");
+				}
+			}
+
+			return $user;
 		}
 
 		/*
 		 * Create a new WordPress account for the specified username.
 		 */
 		function _create_user($username) {
-			$password = $this->_get_password();
+			$password = wp_generate_password();
 			$email_domain = $this->get_option('http_authentication_auto_create_email_domain');
 
 			require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
-			wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
+			$user_id = wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
+			$user = get_user_by('id', $user_id);
+
+			return $user;
 		}
 
 		/*
@@ -259,4 +222,16 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 
 // Load the plugin hooks, etc.
 $http_authentication_plugin = new HTTPAuthenticationPlugin();
+
+// Override pluggable function to avoid ordering problem with 'authenticate' filter
+if (! function_exists('wp_authenticate')) {
+	function wp_authenticate($username, $password) {
+		global $http_authentication_plugin;
+
+		$user = $http_authentication_plugin->check_user();
+		$user = new WP_User($user->ID);
+
+		return $user;
+	}
+}
 ?>
