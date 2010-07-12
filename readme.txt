@@ -2,7 +2,7 @@
 Contributors: dwc
 Tags: authentication
 Requires at least: 2.5.1
-Tested up to: 2.9.2
+Tested up to: 3.0
 Stable tag: 2.3
 
 Use an external authentication source in WordPress.
@@ -76,6 +76,9 @@ Also, you should leave the `admin` user as a fallback, i.e. create a new account
 In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to [reset a user's password](http://codex.wordpress.org/Resetting_Your_Password).
 
 == Changelog ==
+
+= 3.0 =
+* Add support for WordPress 3.0
 
 = 2.4 =
 * Add support for WordPress MU (Elliot Kendall)
