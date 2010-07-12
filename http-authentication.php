@@ -9,9 +9,10 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
 
 if (! class_exists('HTTPAuthenticationPlugin')) {
-	$wpmu;
-	
+
 	class HTTPAuthenticationPlugin {
+		var $wpmu;
+
 		function HTTPAuthenticationPlugin() {
 			// Administration handlers
 			register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
