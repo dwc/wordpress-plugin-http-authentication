@@ -96,7 +96,7 @@ class HTTPAuthenticationPlugin {
 	 * variable is set, use it as the username. This assumes that
 	 * you have externally authenticated the user.
 	 */
-	function check_user() {
+	function check_remote_user() {
 		$username = '';
 
 		foreach (array('REMOTE_USER', 'REDIRECT_REMOTE_USER') as $key) {
@@ -147,7 +147,7 @@ if (! function_exists('wp_authenticate')) {
 	function wp_authenticate($username, $password) {
 		global $http_authentication_plugin;
 
-		$user = $http_authentication_plugin->check_user();
+		$user = $http_authentication_plugin->check_remote_user();
 		if (! is_wp_error($user)) {
 			$user = new WP_User($user->ID);
 		}
@@ -161,7 +161,7 @@ if (! function_exists('wp_validate_auth_cookie')) {
 	function wp_validate_auth_cookie($cookie = '', $scheme = '') {
 		global $http_authentication_plugin;
 
-		$user = $http_authentication_plugin->check_user();
+		$user = $http_authentication_plugin->check_remote_user();
 		if (is_wp_error($user)) {
 			return false;
 		}
