@@ -10,112 +10,110 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'options-page.php');
 
-if (! class_exists('HTTPAuthenticationPlugin')) {
-	class HTTPAuthenticationPlugin {
-		function HTTPAuthenticationPlugin() {
-			register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
+class HTTPAuthenticationPlugin {
+	function HTTPAuthenticationPlugin() {
+		register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
 
-			$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__);
+		$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__);
 
-			add_filter('show_password_fields', array(&$this, 'disable'));
-			add_action('allow_password_reset', array(&$this, 'disable'));
-			add_action('wp_logout', array(&$this, 'logout'));
-		}
-
-
-		/*************************************************************
-		 * Plugin hooks
-		 *************************************************************/
-
-		/*
-		 * Add the default options to the database.
-		 */
-		function initialize_options() {
-			$options = array(
-				'logout_uri' => get_site_option('home'),
-				'auto_create_user' => false,
-				'auto_create_email_domain' => '',
-			);
-
-			update_site_option('http_authentication_options', $options);
-		}
-
-		/*
-		 * Logout the user by redirecting them to the logout URI.
-		 */
-		function logout() {
-			header('Location: ' . $this->get_plugin_option('logout_uri'));
-			exit();
-		}
-
-		/*
-		 * Used to disable certain display elements, e.g. password
-		 * fields on profile screen, or functions, e.g. password reset.
-		 */
-		function disable($flag) {
-			return false;
-		}
+		add_filter('show_password_fields', array(&$this, 'disable'));
+		add_action('allow_password_reset', array(&$this, 'disable'));
+		add_action('wp_logout', array(&$this, 'logout'));
+	}
 
 
-		/*************************************************************
-		 * Functions
-		 *************************************************************/
+	/*************************************************************
+	 * Plugin hooks
+	 *************************************************************/
 
-		/*
-		 * Get the value of the specified plugin-specific option.
-		 */
-		function get_plugin_option($option) {
-			$options = get_site_option('http_authentication_options');
+	/*
+	 * Add the default options to the database.
+	 */
+	function initialize_options() {
+		$options = array(
+			'logout_uri' => get_site_option('home'),
+			'auto_create_user' => false,
+			'auto_create_email_domain' => '',
+		);
 
-			return $options[$option];
-		}
+		update_site_option('http_authentication_options', $options);
+	}
 
-		/*
-		 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment
-		 * variable is set, use it as the username. This assumes that
-		 * you have externally authenticated the user.
-		 */
-		function check_user() {
-			$username = '';
+	/*
+	 * Logout the user by redirecting them to the logout URI.
+	 */
+	function logout() {
+		header('Location: ' . $this->get_plugin_option('logout_uri'));
+		exit();
+	}
 
-			foreach (array('REMOTE_USER', 'REDIRECT_REMOTE_USER') as $key) {
-				if (isset($_SERVER[$key])) {
-					$username = $_SERVER[$key];
-				}
+	/*
+	 * Used to disable certain display elements, e.g. password
+	 * fields on profile screen, or functions, e.g. password reset.
+	 */
+	function disable($flag) {
+		return false;
+	}
+
+
+	/*************************************************************
+	 * Functions
+	 *************************************************************/
+
+	/*
+	 * Get the value of the specified plugin-specific option.
+	 */
+	function get_plugin_option($option) {
+		$options = get_site_option('http_authentication_options');
+
+		return $options[$option];
+	}
+
+	/*
+	 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment
+	 * variable is set, use it as the username. This assumes that
+	 * you have externally authenticated the user.
+	 */
+	function check_user() {
+		$username = '';
+
+		foreach (array('REMOTE_USER', 'REDIRECT_REMOTE_USER') as $key) {
+			if (isset($_SERVER[$key])) {
+				$username = $_SERVER[$key];
 			}
-
-			if (! $username) {
-				return new WP_Error('empty_username', 'No REMOTE_USER or REDIRECT_REMOTE_USER found.');
-			}
-
-			// Create new users automatically, if configured
-			$user = get_userdatabylogin($username);
-			if (! $user) {
-				if ((bool) $this->get_plugin_option('auto_create_user')) {
-					$user = $this->_create_user($username);
-				}
-				else {
-					// Bail out to avoid showing the login form
-					die("User $username does not exist in the WordPress database");
-				}
-			}
-
-			return $user;
 		}
 
-		/*
-		 * Create a new WordPress account for the specified username.
-		 */
-		function _create_user($username) {
-			$password = wp_generate_password();
-			$email_domain = $this->get_plugin_option('auto_create_email_domain');
-
-			require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
-			$user_id = wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
-			$user = get_user_by('id', $user_id);
-
-			return $user;
+		if (! $username) {
+			return new WP_Error('empty_username', 'No REMOTE_USER or REDIRECT_REMOTE_USER found.');
 		}
+
+		// Create new users automatically, if configured
+		$user = get_userdatabylogin($username);
+		if (! $user) {
+			if ((bool) $this->get_plugin_option('auto_create_user')) {
+				$user = $this->_create_user($username);
+			}
+			else {
+				// Bail out to avoid showing the login form
+				die("User $username does not exist in the WordPress database");
+			}
+		}
+
+		return $user;
+	}
+
+	/*
+	 * Create a new WordPress account for the specified username.
+	 */
+	function _create_user($username) {
+		$password = wp_generate_password();
+		$email_domain = $this->get_plugin_option('auto_create_email_domain');
+
+		require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
+		$user_id = wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
+		$user = get_user_by('id', $user_id);
+
+		return $user;
 	}
 }
 
