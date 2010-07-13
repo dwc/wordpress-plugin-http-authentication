@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 2.2
+Version: 2.4
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2008/04/16/http-authentication-20/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
