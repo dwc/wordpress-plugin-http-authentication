@@ -155,4 +155,18 @@ if (! function_exists('wp_authenticate')) {
 		return $user;
 	}
 }
+
+// Bypass the cookie check that occurs on reauth=1 (e.g. if someone navigates directly to wp-admin)
+if (! function_exists('wp_validate_auth_cookie')) {
+	function wp_validate_auth_cookie($cookie = '', $scheme = '') {
+		global $http_authentication_plugin;
+
+		$user = $http_authentication_plugin->check_user();
+		if (is_wp_error($user)) {
+			return false;
+		}
+
+		return $user->ID;
+	}
+}
 ?>
