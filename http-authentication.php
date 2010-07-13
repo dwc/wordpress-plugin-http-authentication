@@ -13,6 +13,7 @@ require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'options-page.php');
 class HTTPAuthenticationPlugin {
 	function HTTPAuthenticationPlugin() {
 		register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
+		add_action('init', array(&$this, 'migrate_options'));
 
 		$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__);
 
@@ -36,7 +37,28 @@ class HTTPAuthenticationPlugin {
 			'auto_create_email_domain' => '',
 		);
 
+		// Copy old options
+		foreach (array_keys($options) as $key) {
+			$old_value = get_site_option("http_authentication_$key");
+			if ($old_value !== false) {
+				$options[$key] = $old_value;
+			}
+
+			delete_site_option("http_authentication_$key");
+		}
+
 		update_site_option('http_authentication_options', $options);
+	}
+
+	/*
+	 * Migrate options for in-place upgrades of the plugin.
+	 */
+	function migrate_options() {
+		// Check if we've migrated options already
+		$options = get_site_option('http_authentication_options');
+		if ($options !== false) return;
+
+		$this->initialize_options();
 	}
 
 	/*
