@@ -18,7 +18,7 @@ class HTTPAuthenticationPlugin {
 		$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__);
 
 		add_filter('show_password_fields', array(&$this, 'disable'));
-		add_action('allow_password_reset', array(&$this, 'disable'));
+		add_filter('allow_password_reset', array(&$this, 'disable'));
 		add_action('wp_logout', array(&$this, 'logout'));
 	}
 
@@ -62,19 +62,19 @@ class HTTPAuthenticationPlugin {
 	}
 
 	/*
-	 * Logout the user by redirecting them to the logout URI.
-	 */
-	function logout() {
-		header('Location: ' . $this->get_plugin_option('logout_uri'));
-		exit();
-	}
-
-	/*
 	 * Used to disable certain display elements, e.g. password
 	 * fields on profile screen, or functions, e.g. password reset.
 	 */
 	function disable($flag) {
 		return false;
+	}
+
+	/*
+	 * Logout the user by redirecting them to the logout URI.
+	 */
+	function logout() {
+		header('Location: ' . $this->get_plugin_option('logout_uri'));
+		exit();
 	}
 
 
