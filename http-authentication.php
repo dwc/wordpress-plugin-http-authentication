@@ -11,9 +11,10 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 if (! class_exists('HTTPAuthenticationPlugin')) {
 	class HTTPAuthenticationPlugin {
 		function HTTPAuthenticationPlugin() {
-			// Administration handlers
 			register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
 
+			// Administration handlers
+			add_action('admin_init', array(&$this, 'register_options'));
 			add_action('admin_menu', array(&$this, 'add_options_page'));
 			add_filter('show_password_fields', array(&$this, 'disable'));
 
@@ -27,27 +28,35 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * Plugin hooks
 		 *************************************************************/
 
-		/*
-		 * Add options for this plugin to the database.
-		 */
 		function initialize_options() {
-			if (current_user_can('manage_options')) {
-				add_option('http_authentication_logout_uri', $this->get_option('home'), 'The URI to which the user is redirected when she chooses "Logout".');
-				add_option('http_authentication_auto_create_user', false, 'Should a new user be created automatically if not already in the WordPress database?');
-				add_option('http_authentication_auto_create_email_domain', '', 'The domain to use for the email address of an automatically created user.');
-			}
+			$options = array(
+				'logout_uri' => $this->get_option('home'),
+				'auto_create_user' => false,
+				'auto_create_email_domain' => '',
+			);
+
+			$this->update_option('http_authentication_options', $options);
+		}
+
+		function register_options() {
+			register_setting('http_authentication_options', 'http_authentication_options');
+
+			add_settings_section('http_authentication_main', 'Main Options', array(&$this, '_display_options_section'), __FILE__);
+			add_settings_field('http_authentication_logout_uri', 'Logout URI', array(&$this, '_display_option_logout_uri'), __FILE__, 'http_authentication_main');
+			add_settings_field('http_authentication_auto_create_user', 'Automatically create accounts?', array(&$this, '_display_option_auto_create_user'), __FILE__, 'http_authentication_main');
+			add_settings_field('http_authentication_auto_create_email_domain', 'Email address domain', array(&$this, '_display_option_auto_create_email_domain'), __FILE__, 'http_authentication_main');
 		}
 
 		/*
-		 * Add an options pane for this plugin.
+		 * Add a options page for this plugin.
 		 */
 		function add_options_page() {
 			if (function_exists('is_site_admin') && is_site_admin()) {
 				add_submenu_page('wpmu-admin.php', 'HTTP Authentication', 'HTTP Authentication', 'manage_options', __FILE__, array(&$this, '_display_options_page'));
-				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, '_display_options_page'));
+				add_options_page('HTTP Authentication', 'HTTP Authentication', 'manage_options', __FILE__, array(&$this, '_display_options_page'));
 			}
 			else {
-				add_options_page('HTTP Authentication', 'HTTP Authentication', 9, __FILE__, array(&$this, '_display_options_page'));
+				add_options_page('HTTP Authentication', 'HTTP Authentication', 'manage_options', __FILE__, array(&$this, '_display_options_page'));
 			}
 		}
 
@@ -55,7 +64,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * Logout the user by redirecting them to the logout URI.
 		 */
 		function logout() {
-			header('Location: ' . $this->get_option('http_authentication_logout_uri'));
+			header('Location: ' . $this->get_plugin_option('logout_uri'));
 			exit();
 		}
 
@@ -79,11 +88,24 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 			return function_exists('get_site_option') ? get_site_option($option) : get_option($option);
 		}
 
+		function get_plugin_option($option) {
+			$options = $this->get_option('http_authentication_options');
+
+			return $options[$option];
+		}
+
 		/*
 		 * Use the appropriate update_option function for our MU config.
 		 */
 		function update_option($option, $value) {
 			return function_exists('update_site_option') ? update_site_option($option, $value) : update_option($option, $value);
+		}
+
+		/*
+		 * Use the appropriate delete_option function for our MU config.
+		 */
+		function delete_option($option) {
+			return function_exists('delete_site_option') ? delete_site_option($option) : delete_option($option);
 		}
 
 		/*
@@ -107,7 +129,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 			// Create new users automatically, if configured
 			$user = get_userdatabylogin($username);
 			if (! $user) {
-				if ((bool) $this->get_option('http_authentication_auto_create_user')) {
+				if ((bool) $this->get_plugin_option('auto_create_user')) {
 					$user = $this->_create_user($username);
 				}
 				else {
@@ -124,7 +146,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 */
 		function _create_user($username) {
 			$password = wp_generate_password();
-			$email_domain = $this->get_option('http_authentication_auto_create_email_domain');
+			$email_domain = $this->get_plugin_option('auto_create_email_domain');
 
 			require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
 			$user_id = wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
@@ -137,60 +159,45 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 * Display the options for this plugin.
 		 */
 		function _display_options_page() {
-			// Update any options that were set
-			foreach (array('logout_uri', 'auto_create_email_domain') as $key) {
-				$key = "http_authentication_$key";
-				if (isset($_POST[$key])) {
-					$this->update_option($key, trim($_POST[$key]));
-				}
-			}
-
-			// Update boolean option (if unchecked, it doesn't get set)
-			if ($_POST) {
-				$key = 'http_authentication_auto_create_user';
-				$this->update_option($key, (bool) $_POST[$key]);
-			}
-
-			$logout_uri = $this->get_option('http_authentication_logout_uri');
-			$auto_create_user = (bool) $this->get_option('http_authentication_auto_create_user');
-			$auto_create_email_domain = $this->get_option('http_authentication_auto_create_email_domain');
 ?>
 <div class="wrap">
   <h2>HTTP Authentication Options</h2>
-  <form method="post" action="<?php echo $_SERVER['REDIRECT_SCRIPT_URI'] . '?page=' . plugin_basename(__FILE__); ?>&updated=true">
-    <input type="hidden" name="action" value="update" />
-    <input type="hidden" name="page_options" value="http_authentication_logout_uri,http_authentication_auto_create_user,http_authentication_auto_create_email_domain" />
-    <?php if (function_exists('wp_nonce_field')): wp_nonce_field('update-options'); endif; ?>
-
-    <table class="form-table">
-      <tr valign="top">
-        <th scope="row"><label for="http_authentication_logout_uri">Logout URI</label></th>
-        <td>
-          <input type="text" name="http_authentication_logout_uri" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-          Default is <code><?php echo htmlspecialchars($this->get_option('home')); ?></code>; override to e.g. remove a cookie.
-        </td>
-      </tr>
-      <tr valign="top">
-        <th scope="row"><label for="http_authentication_auto_create_user">Automatically create accounts?</label></th>
-        <td>
-          <input type="checkbox" name="http_authentication_auto_create_user" id="http_authentication_auto_create_user"<?php if ($auto_create_user) echo ' checked="checked"' ?> value="1" /><br />
-          Should a new user be created automatically if not already in the WordPress database?<br />
-          Created users will obtain the role defined under &quot;New User Default Role&quot; on the <a href="options-general.php">General Options</a> page.
-        </td>
-      </tr>
-      <tr valign="top">
-        <th scope="row"><label for="http_authentication_auto_create_email_domain">Email address domain</label></th>
-        <td>
-          <input type="text" name="http_authentication_auto_create_email_domain" id="http_authentication_auto_create_email_domain" value="<?php echo htmlspecialchars($auto_create_email_domain) ?>" size="50" /><br />
-          When a new user logs in, this domain is used for the initial email address on their account. The user can change his or her email address by editing their profile.
-        </td>
-      </tr>
-    </table>
+  <form action="options.php" method="post">
+    <?php settings_fields('http_authentication_options'); ?>
+    <?php do_settings_sections(__FILE__); ?>
     <p class="submit">
-      <input type="submit" name="Submit" value="Save Changes" />
+      <input type="submit" name="Submit" value="<?php esc_attr_e('Save Changes'); ?>" class="button-primary" />
     </p>
   </form>
 </div>
+<?php
+		}
+
+		function _display_options_section() {
+		}
+
+		function _display_option_logout_uri() {
+			$logout_uri = $this->get_plugin_option('logout_uri');
+?>
+<input type="text" name="http_authentication_options[logout_uri]" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
+Default is <code><?php echo htmlspecialchars($this->get_option('home')); ?></code>; override to e.g. remove a cookie.
+<?php
+		}
+
+		function _display_option_auto_create_user() {
+			$auto_create_user = $this->get_plugin_option('auto_create_user');
+?>
+<input type="checkbox" name="http_authentication_options[auto_create_user]" id="http_authentication_auto_create_user"<?php if ($auto_create_user) echo ' checked="checked"' ?> value="1" /><br />
+Should a new user be created automatically if not already in the WordPress database?<br />
+Created users will obtain the role defined under &quot;New User Default Role&quot; on the <a href="options-general.php">General Options</a> page.
+<?php
+		}
+
+		function _display_option_auto_create_email_domain() {
+			$auto_create_email_domain = $this->get_plugin_option('auto_create_email_domain');
+?>
+<input type="text" name="http_authentication_options[auto_create_email_domain]" id="http_authentication_auto_create_email_domain" value="<?php echo htmlspecialchars($auto_create_email_domain) ?>" size="50" /><br />
+When a new user logs in, this domain is used for the initial email address on their account. The user can change his or her email address by editing their profile.
 <?php
 		}
 	}
