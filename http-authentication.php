@@ -30,12 +30,12 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 
 		function initialize_options() {
 			$options = array(
-				'logout_uri' => $this->get_option('home'),
+				'logout_uri' => get_site_option('home'),
 				'auto_create_user' => false,
 				'auto_create_email_domain' => '',
 			);
 
-			$this->update_option('http_authentication_options', $options);
+			update_site_option('http_authentication_options', $options);
 		}
 
 		function register_options() {
@@ -82,30 +82,12 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 		 *************************************************************/
 
 		/*
-		 * Use the appropriate get_option function for our MU config.
+		 * Get the value of the specified plugin-specific option.
 		 */
-		function get_option($option) {
-			return function_exists('get_site_option') ? get_site_option($option) : get_option($option);
-		}
-
 		function get_plugin_option($option) {
-			$options = $this->get_option('http_authentication_options');
+			$options = get_site_option('http_authentication_options');
 
 			return $options[$option];
-		}
-
-		/*
-		 * Use the appropriate update_option function for our MU config.
-		 */
-		function update_option($option, $value) {
-			return function_exists('update_site_option') ? update_site_option($option, $value) : update_option($option, $value);
-		}
-
-		/*
-		 * Use the appropriate delete_option function for our MU config.
-		 */
-		function delete_option($option) {
-			return function_exists('delete_site_option') ? delete_site_option($option) : delete_option($option);
 		}
 
 		/*
@@ -180,7 +162,7 @@ if (! class_exists('HTTPAuthenticationPlugin')) {
 			$logout_uri = $this->get_plugin_option('logout_uri');
 ?>
 <input type="text" name="http_authentication_options[logout_uri]" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-Default is <code><?php echo htmlspecialchars($this->get_option('home')); ?></code>; override to e.g. remove a cookie.
+Default is <code><?php echo htmlspecialchars(get_site_option('home')); ?></code>; override to e.g. remove a cookie.
 <?php
 		}
 
