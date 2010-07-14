@@ -79,8 +79,10 @@ In the worst case scenario, you may have to use phpMyAdmin or the MySQL command 
 
 == Changelog ==
 
-= 3.0.1 =
+= 3.1 =
+* Bump version number to make 3.0.1 the latest version on wordpress.org
 
+= 3.0.1 =
 * Handle authentication cookies more gracefully
 
 = 3.0 =
