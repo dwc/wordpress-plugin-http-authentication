@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 3.1
+Version: 3.2
 Plugin URI: https://dev.webadmin.ufl.edu/~dwc/2010/07/13/http-authentication-3-0/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -20,6 +20,7 @@ class HTTPAuthenticationPlugin {
 		add_filter('login_url', array(&$this, 'bypass_reauth'));
 		add_filter('show_password_fields', array(&$this, 'disable'));
 		add_filter('allow_password_reset', array(&$this, 'disable'));
+		add_action('check_passwords', array(&$this, 'generate_password'), 10, 3);
 		add_action('wp_logout', array(&$this, 'logout'));
 	}
 
@@ -80,6 +81,15 @@ class HTTPAuthenticationPlugin {
 	 */
 	function disable($flag) {
 		return false;
+	}
+
+	/*
+	 * Generate a password for the user. This plugin does not require the
+	 * administrator to enter this value, but we need to set it so that user
+	 * creation and editing works.
+	 */
+	function generate_password($username, $password1, $password2) {
+		$password1 = $password2 = wp_generate_password();
 	}
 
 	/*
