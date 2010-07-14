@@ -79,6 +79,10 @@ In the worst case scenario, you may have to use phpMyAdmin or the MySQL command 
 
 == Changelog ==
 
+= 3.0.1 =
+
+* Handle authentication cookies more gracefully
+
 = 3.0 =
 * Add support for WordPress 3.0
 * Update WordPress MU support for WordPress 3.0

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 3.0
+Version: 3.0.1
 Plugin URI: https://dev.webadmin.ufl.edu/~dwc/2010/07/13/http-authentication-3-0/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -17,6 +17,7 @@ class HTTPAuthenticationPlugin {
 
 		$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__);
 
+		add_filter('login_url', array(&$this, 'bypass_reauth'));
 		add_filter('show_password_fields', array(&$this, 'disable'));
 		add_filter('allow_password_reset', array(&$this, 'disable'));
 		add_action('wp_logout', array(&$this, 'logout'));
@@ -59,6 +60,18 @@ class HTTPAuthenticationPlugin {
 		if ($options !== false) return;
 
 		$this->initialize_options();
+	}
+
+	/*
+	 * Remove the reauth=1 parameter from the login URL, if applicable. This allows
+	 * us to transparently bypass the mucking about with cookies that happens in
+	 * wp-login.php immediately after wp_signon when a user e.g. navigates directly
+	 * to wp-admin.
+	 */
+	function bypass_reauth($login_url) {
+		$login_url = remove_query_arg('reauth', $login_url);
+
+		return $login_url;
 	}
 
 	/*
@@ -153,20 +166,6 @@ if (! function_exists('wp_authenticate')) {
 		}
 
 		return $user;
-	}
-}
-
-// Bypass the cookie check that occurs on reauth=1 (e.g. if someone navigates directly to wp-admin)
-if (! function_exists('wp_validate_auth_cookie')) {
-	function wp_validate_auth_cookie($cookie = '', $scheme = '') {
-		global $http_authentication_plugin;
-
-		$user = $http_authentication_plugin->check_remote_user();
-		if (is_wp_error($user)) {
-			return false;
-		}
-
-		return $user->ID;
 	}
 }
 ?>
