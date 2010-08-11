@@ -2,7 +2,7 @@
 Contributors: dwc
 Tags: authentication
 Requires at least: 3.0
-Tested up to: 3.0
+Tested up to: 3.0.1
 Stable tag: 3.2
 
 Use an external authentication source in WordPress.
@@ -78,6 +78,9 @@ Also, you should leave the `admin` user as a fallback, i.e. create a new account
 In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to [reset a user's password](http://codex.wordpress.org/Resetting_Your_Password).
 
 == Changelog ==
+
+= 3.3 =
+* Update options handling to better support WordPress MU
 
 = 3.2 =
 * Restore password generation for adding and editing users

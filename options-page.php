@@ -72,7 +72,7 @@ class HTTPAuthenticationOptionsPage {
 		$logout_uri = $this->plugin->get_plugin_option('logout_uri');
 ?>
 <input type="text" name="<?php echo htmlspecialchars($this->group); ?>[logout_uri]" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-Default is <code><?php echo htmlspecialchars(get_site_option('home')); ?></code>; override to e.g. remove a cookie.
+Default is <code><?php echo htmlspecialchars(get_option('home')); ?></code>; override to e.g. remove a cookie.
 <?php
 	}
 

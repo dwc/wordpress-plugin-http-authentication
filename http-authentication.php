@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 3.2
+Version: 3.3
 Plugin URI: https://dev.webadmin.ufl.edu/~dwc/2010/07/13/http-authentication-3-0/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -34,22 +34,22 @@ class HTTPAuthenticationPlugin {
 	 */
 	function initialize_options() {
 		$options = array(
-			'logout_uri' => get_site_option('home'),
+			'logout_uri' => get_option('home'),
 			'auto_create_user' => false,
 			'auto_create_email_domain' => '',
 		);
 
 		// Copy old options
 		foreach (array_keys($options) as $key) {
-			$old_value = get_site_option("http_authentication_$key");
+			$old_value = get_option("http_authentication_$key");
 			if ($old_value !== false) {
 				$options[$key] = $old_value;
 			}
 
-			delete_site_option("http_authentication_$key");
+			delete_option("http_authentication_$key");
 		}
 
-		update_site_option('http_authentication_options', $options);
+		update_option('http_authentication_options', $options);
 	}
 
 	/*
@@ -57,7 +57,7 @@ class HTTPAuthenticationPlugin {
 	 */
 	function migrate_options() {
 		// Check if we've migrated options already
-		$options = get_site_option('http_authentication_options');
+		$options = get_option('http_authentication_options');
 		if ($options !== false) return;
 
 		$this->initialize_options();
@@ -109,7 +109,7 @@ class HTTPAuthenticationPlugin {
 	 * Get the value of the specified plugin-specific option.
 	 */
 	function get_plugin_option($option) {
-		$options = get_site_option('http_authentication_options');
+		$options = get_option('http_authentication_options');
 
 		return $options[$option];
 	}
