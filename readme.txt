@@ -81,6 +81,7 @@ In the worst case scenario, you may have to use phpMyAdmin or the MySQL command 
 
 = 4.0 =
 * Allow the plugin to fallback to WordPress password authentication
+* Remove migration of old options format (we'll assume enough people have upgraded)
 
 = 3.3 =
 * Update options handling to better support WordPress MU
