@@ -23,6 +23,8 @@ class HTTPAuthenticationOptionsPage {
 
 		$section = 'http_authentication_main';
 		add_settings_section($section, 'Main Options', array(&$this, '_display_options_section'), $this->page);
+		add_settings_field('http_authentication_allow_wp_auth', 'Allow WordPress authentication?', array(&$this, '_display_option_allow_wp_auth'), $this->page, $section);
+		add_settings_field('http_authentication_login_uri', 'Login URI', array(&$this, '_display_option_login_uri'), $this->page, $section);
 		add_settings_field('http_authentication_logout_uri', 'Logout URI', array(&$this, '_display_option_logout_uri'), $this->page, $section);
 		add_settings_field('http_authentication_auto_create_user', 'Automatically create accounts?', array(&$this, '_display_option_auto_create_user'), $this->page, $section);
 		add_settings_field('http_authentication_auto_create_email_domain', 'Email address domain', array(&$this, '_display_option_auto_create_email_domain'), $this->page, $section);
@@ -66,13 +68,37 @@ class HTTPAuthenticationOptionsPage {
 	}
 
 	/*
+	 * Display the WordPress authentication checkbox.
+	 */
+	function _display_option_allow_wp_auth() {
+		$allow_wp_auth = $this->plugin->get_plugin_option('allow_wp_auth');
+?>
+<input type="checkbox" name="<?php echo htmlspecialchars($this->group); ?>[allow_wp_auth]" id="http_authentication_allow_wp_auth"<?php if ($allow_wp_auth) echo ' checked="checked"' ?> value="1" /><br />
+Should the plugin fallback to WordPress authentication if none is found from the server?
+<?php
+	}
+
+	/*
+	 * Display the login URI field.
+	 */
+	function _display_option_login_uri() {
+		$login_uri = $this->plugin->get_plugin_option('login_uri');
+?>
+<input type="text" name="<?php echo htmlspecialchars($this->group); ?>[login_uri]" id="http_authentication_login_uri" value="<?php echo htmlspecialchars($login_uri) ?>" size="50" /><br />
+Default is <code><?php echo htmlspecialchars(wp_login_url()); ?></code>; override to direct users to a single sign-on system.<br />
+The string <code>%s</code> will be replaced with the appropriate return URI as provided by WordPress.
+<?php
+	}
+
+	/*
 	 * Display the logout URI field.
 	 */
 	function _display_option_logout_uri() {
 		$logout_uri = $this->plugin->get_plugin_option('logout_uri');
 ?>
 <input type="text" name="<?php echo htmlspecialchars($this->group); ?>[logout_uri]" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-Default is <code><?php echo htmlspecialchars(get_option('home')); ?></code>; override to e.g. remove a cookie.
+Default is <code><?php echo htmlspecialchars(wp_logout_url()); ?></code>; override to e.g. remove a cookie.<br />
+The string <code>%s</code> will be replaced with your blog's home URI.
 <?php
 	}
 
