@@ -24,6 +24,7 @@ class HTTPAuthenticationOptionsPage {
 		$section = 'http_authentication_main';
 		add_settings_section($section, 'Main Options', array(&$this, '_display_options_section'), $this->page);
 		add_settings_field('http_authentication_allow_wp_auth', 'Allow WordPress authentication?', array(&$this, '_display_option_allow_wp_auth'), $this->page, $section);
+		add_settings_field('http_authentication_auth_label', 'Authentication label', array(&$this, '_display_option_auth_label'), $this->page, $section);
 		add_settings_field('http_authentication_login_uri', 'Login URI', array(&$this, '_display_option_login_uri'), $this->page, $section);
 		add_settings_field('http_authentication_logout_uri', 'Logout URI', array(&$this, '_display_option_logout_uri'), $this->page, $section);
 		add_settings_field('http_authentication_auto_create_user', 'Automatically create accounts?', array(&$this, '_display_option_auto_create_user'), $this->page, $section);
@@ -75,6 +76,18 @@ class HTTPAuthenticationOptionsPage {
 ?>
 <input type="checkbox" name="<?php echo htmlspecialchars($this->group); ?>[allow_wp_auth]" id="http_authentication_allow_wp_auth"<?php if ($allow_wp_auth) echo ' checked="checked"' ?> value="1" /><br />
 Should the plugin fallback to WordPress authentication if none is found from the server?
+<?php
+	}
+
+	/*
+	 * Display the authentication label field, describing the authentication system
+	 * in use.
+	 */
+	function _display_option_auth_label() {
+		$auth_label = $this->plugin->get_plugin_option('auth_label');
+?>
+<input type="text" name="<?php echo htmlspecialchars($this->group); ?>[auth_label]" id="http_authentication_auth_label" value="<?php echo htmlspecialchars($auth_label) ?>" size="50" /><br />
+Default is <code>HTTP authentication</code>; override to use the name of your single sign-on system.
 <?php
 	}
 

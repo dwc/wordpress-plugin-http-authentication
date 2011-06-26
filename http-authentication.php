@@ -36,6 +36,7 @@ class HTTPAuthenticationPlugin {
 	function initialize_options() {
 		$options = array(
 			'allow_wp_auth' => false,
+			'auth_label' => 'HTTP authentication',
 			'login_uri' => wp_login_url(),
 			'logout_uri' => wp_logout_url(),
 			'auto_create_user' => false,
@@ -89,8 +90,9 @@ class HTTPAuthenticationPlugin {
 		global $redirect_to;
 
 		$login_uri = sprintf($this->get_plugin_option('login_uri'), urlencode($redirect_to));
+		$auth_label = $this->get_plugin_option('auth_label');
 
-		echo "\t" . '<p><a href="' . htmlspecialchars($login_uri) . '">Login with HTTP authentication</a></p>' . "\n";
+		echo "\t" . '<p><a href="' . htmlspecialchars($login_uri) . '">Login with ' . htmlspecialchars($auth_label) . '</a></p>' . "\n";
 	}
 
 	/*
