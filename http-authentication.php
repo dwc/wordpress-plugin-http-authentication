@@ -57,6 +57,10 @@ class HTTPAuthenticationPlugin {
 		return $login_url;
 	}
 
+	/*
+	 * Authenticate the user, first using the external authentication source.
+	 * If allowed, fall back to WordPress password authentication.
+	 */
 	function authenticate($user, $username, $password) {
 		$user = $this->check_remote_user();
 
@@ -78,6 +82,9 @@ class HTTPAuthenticationPlugin {
 		return $user;
 	}
 
+	/*
+	 * Add a link to the login form to initiate external authentication.
+	 */
 	function add_login_link() {
 		global $redirect_to;
 
@@ -129,9 +136,8 @@ class HTTPAuthenticationPlugin {
 	}
 
 	/*
-	 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment
-	 * variable is set, use it as the username. This assumes that
-	 * you have externally authenticated the user.
+	 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment variable is set, use it
+	 * as the username. This assumes that you have externally authenticated the user.
 	 */
 	function check_remote_user() {
 		$username = '';
