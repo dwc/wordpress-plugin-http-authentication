@@ -60,6 +60,9 @@ class HTTPAuthenticationOptionsPage {
 	 * Display the options for this plugin.
 	 */
 	function _display_options_page() {
+		if (! current_user_can('manage_options')) {
+			wp_die(__('You do not have sufficient permissions to access this page.'));
+		}
 ?>
 <div class="wrap">
   <h2>HTTP Authentication Options</h2>
