@@ -11,30 +11,48 @@ Author URI: https://dev.webadmin.ufl.edu/~dwc/
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'options-page.php');
 
 class HTTPAuthenticationPlugin {
+	var $db_version = 1;
+	var $option_name = 'http_authentication_options';
+	var $options;
+
 	function HTTPAuthenticationPlugin() {
-		register_activation_hook(__FILE__, array(&$this, 'initialize_options'));
+		$this->options = get_option($this->option_name);
 
-		$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__);
+		if (is_admin()) {
+			$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__, $this->options);
+			add_action('admin_init', array(&$this, 'check_options'));
+		}
 
+		add_action('login_form', array(&$this, 'add_login_link'));
+		add_action('check_passwords', array(&$this, 'generate_password'), 10, 3);
+		add_action('wp_logout', array(&$this, 'logout'));
 		add_filter('login_url', array(&$this, 'bypass_reauth'));
 		add_filter('show_password_fields', array(&$this, 'allow_wp_auth'));
 		add_filter('allow_password_reset', array(&$this, 'allow_wp_auth'));
 		add_filter('authenticate', array(&$this, 'authenticate'), 10, 3);
-		add_action('login_form', array(&$this, 'add_login_link'));
-		add_action('check_passwords', array(&$this, 'generate_password'), 10, 3);
-		add_action('wp_logout', array(&$this, 'logout'));
 	}
 
+	/*
+	 * Check the options currently in the database and upgrade if necessary.
+	 */
+	function check_options() {
+		if ($this->options === false || ! isset($this->options['db_version']) || $this->options['db_version'] < $this->db_version) {
+			if (! is_array($this->options)) {
+				$this->options = array();
+			}
 
-	/*************************************************************
-	 * Plugin hooks
-	 *************************************************************/
+                        $current_db_version = isset($this->options['db_version']) ? $this->options['db_version'] : 0;
+			$this->upgrade($current_db_version);
+			$this->options['db_version'] = $this->db_version;
+			update_option($this->option_name, $this->options);
+                }
+	}
 
 	/*
-	 * Add the default options to the database.
+	 * Upgrade options as needed depending on the current database version.
 	 */
-	function initialize_options() {
-		$options = array(
+	function upgrade($current_db_version) {
+		$default_options = array(
 			'allow_wp_auth' => false,
 			'auth_label' => 'HTTP authentication',
 			'login_uri' => wp_login_url(),
@@ -43,7 +61,47 @@ class HTTPAuthenticationPlugin {
 			'auto_create_email_domain' => '',
 		);
 
-		update_option('http_authentication_options', $options);
+		if ($current_db_version < 1) {
+			foreach ($default_options as $key => $value) {
+				// Handle migrating existing options from before we stored a db_version
+				if (! isset($this->options[$key])) {
+					$this->options[$key] = $value;
+				}
+			}
+		}
+	}
+
+	/*
+	 * Add a link to the login form to initiate external authentication.
+	 */
+	function add_login_link() {
+		global $redirect_to;
+
+		$login_uri = sprintf($this->options['login_uri'], urlencode($redirect_to));
+		$auth_label = $this->options['auth_label'];
+
+		echo "\t" . '<p><a href="' . htmlspecialchars($login_uri) . '">Login with ' . htmlspecialchars($auth_label) . '</a></p>' . "\n";
+	}
+
+	/*
+	 * Generate a password for the user. This plugin does not require the
+	 * administrator to enter this value, but we need to set it so that user
+	 * creation and editing works.
+	 */
+	function generate_password($username, $password1, $password2) {
+		if (! $this->allow_wp_auth()) {
+			$password1 = $password2 = wp_generate_password();
+		}
+	}
+
+	/*
+	 * Logout the user by redirecting them to the logout URI.
+	 */
+	function logout() {
+		$logout_uri = sprintf($this->options['logout_uri'], urlencode(home_url()));
+
+		wp_redirect($logout_uri);
+		exit();
 	}
 
 	/*
@@ -56,6 +114,13 @@ class HTTPAuthenticationPlugin {
 		$login_url = remove_query_arg('reauth', $login_url);
 
 		return $login_url;
+	}
+
+	/*
+	 * Can we fallback to built-in WordPress authentication?
+	 */
+	function allow_wp_auth() {
+		return (bool) $this->options['allow_wp_auth'];
 	}
 
 	/*
@@ -84,60 +149,6 @@ class HTTPAuthenticationPlugin {
 	}
 
 	/*
-	 * Add a link to the login form to initiate external authentication.
-	 */
-	function add_login_link() {
-		global $redirect_to;
-
-		$login_uri = sprintf($this->get_plugin_option('login_uri'), urlencode($redirect_to));
-		$auth_label = $this->get_plugin_option('auth_label');
-
-		echo "\t" . '<p><a href="' . htmlspecialchars($login_uri) . '">Login with ' . htmlspecialchars($auth_label) . '</a></p>' . "\n";
-	}
-
-	/*
-	 * Generate a password for the user. This plugin does not require the
-	 * administrator to enter this value, but we need to set it so that user
-	 * creation and editing works.
-	 */
-	function generate_password($username, $password1, $password2) {
-		if (! $this->allow_wp_auth()) {
-			$password1 = $password2 = wp_generate_password();
-		}
-	}
-
-	/*
-	 * Logout the user by redirecting them to the logout URI.
-	 */
-	function logout() {
-		$logout_uri = sprintf($this->get_plugin_option('logout_uri'), urlencode(home_url()));
-
-		wp_redirect($logout_uri);
-		exit();
-	}
-
-
-	/*************************************************************
-	 * Functions
-	 *************************************************************/
-
-	/*
-	 * Can we fallback to built-in WordPress authentication?
-	 */
-	function allow_wp_auth() {
-		return (bool) $this->get_plugin_option('allow_wp_auth');
-	}
-
-	/*
-	 * Get the value of the specified plugin-specific option.
-	 */
-	function get_plugin_option($option) {
-		$options = get_option('http_authentication_options');
-
-		return $options[$option];
-	}
-
-	/*
 	 * If the REMOTE_USER or REDIRECT_REMOTE_USER evironment variable is set, use it
 	 * as the username. This assumes that you have externally authenticated the user.
 	 */
@@ -157,7 +168,7 @@ class HTTPAuthenticationPlugin {
 		// Create new users automatically, if configured
 		$user = get_userdatabylogin($username);
 		if (! $user)  {
-			if ((bool) $this->get_plugin_option('auto_create_user')) {
+			if ((bool) $this->options['auto_create_user']) {
 				$user = $this->_create_user($username);
 			}
 			else {
@@ -174,7 +185,7 @@ class HTTPAuthenticationPlugin {
 	 */
 	function _create_user($username) {
 		$password = wp_generate_password();
-		$email_domain = $this->get_plugin_option('auto_create_email_domain');
+		$email_domain = $this->options['auto_create_email_domain'];
 
 		require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
 		$user_id = wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
