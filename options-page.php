@@ -77,7 +77,7 @@ class HTTPAuthenticationOptionsPage {
 <input type="checkbox" name="<?php echo htmlspecialchars($this->group); ?>[allow_wp_auth]" id="http_authentication_allow_wp_auth"<?php if ($allow_wp_auth) echo ' checked="checked"' ?> value="1" /><br />
 Should the plugin fallback to WordPress authentication if none is found from the server?
 <?php
-		if ($this->plugin->get_plugin_option('login_uri') == wp_login_url()) {
+		if ($allow_wp_auth && $this->plugin->get_plugin_option('login_uri') == wp_login_url()) {
 			echo '<br /><strong>WARNING</strong>: You must set the login URI below to your external authentication system. Otherwise you will not be able to login!';
 		}
 	}
