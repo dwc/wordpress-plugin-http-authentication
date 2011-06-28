@@ -99,8 +99,8 @@ class HTTPAuthenticationOptionsPage {
 	 */
 	function _display_option_allow_wp_auth() {
 		$allow_wp_auth = $this->options['allow_wp_auth'];
+		$this->_display_checkbox_field('allow_wp_auth', $allow_wp_auth);
 ?>
-<input type="checkbox" name="<?php echo htmlspecialchars($this->group); ?>[allow_wp_auth]" id="http_authentication_allow_wp_auth"<?php if ($allow_wp_auth) echo ' checked="checked"' ?> value="1" /><br />
 Should the plugin fallback to WordPress authentication if none is found from the server?
 <?php
 		if ($allow_wp_auth && $this->options['login_uri'] == htmlspecialchars_decode(wp_login_url())) {
@@ -114,8 +114,8 @@ Should the plugin fallback to WordPress authentication if none is found from the
 	 */
 	function _display_option_auth_label() {
 		$auth_label = $this->options['auth_label'];
+		$this->_display_input_text_field('auth_label', $auth_label);
 ?>
-<input type="text" name="<?php echo htmlspecialchars($this->group); ?>[auth_label]" id="http_authentication_auth_label" value="<?php echo htmlspecialchars($auth_label) ?>" size="50" /><br />
 Default is <code>HTTP authentication</code>; override to use the name of your single sign-on system.
 <?php
 	}
@@ -125,8 +125,8 @@ Default is <code>HTTP authentication</code>; override to use the name of your si
 	 */
 	function _display_option_login_uri() {
 		$login_uri = $this->options['login_uri'];
+		$this->_display_input_text_field('login_uri', $login_uri);
 ?>
-<input type="text" name="<?php echo htmlspecialchars($this->group); ?>[login_uri]" id="http_authentication_login_uri" value="<?php echo htmlspecialchars($login_uri) ?>" size="50" /><br />
 Default is <code><?php echo wp_login_url(); ?></code>; override to direct users to a single sign-on system.<br />
 The string <code>%s</code> will be replaced with the appropriate return URI as provided by WordPress.
 <?php
@@ -137,8 +137,8 @@ The string <code>%s</code> will be replaced with the appropriate return URI as p
 	 */
 	function _display_option_logout_uri() {
 		$logout_uri = $this->options['logout_uri'];
+		$this->_display_input_text_field('logout_uri', $logout_uri);
 ?>
-<input type="text" name="<?php echo htmlspecialchars($this->group); ?>[logout_uri]" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
 Default is <code><?php echo htmlspecialchars(remove_query_arg('_wpnonce', htmlspecialchars_decode(wp_logout_url()))); ?></code>; override to e.g. remove a cookie.<br />
 The string <code>%s</code> will be replaced with your blog's home URI.
 <?php
@@ -149,8 +149,8 @@ The string <code>%s</code> will be replaced with your blog's home URI.
 	 */
 	function _display_option_auto_create_user() {
 		$auto_create_user = $this->options['auto_create_user'];
+		$this->_display_checkbox_field('auto_create_user', $auto_create_user);
 ?>
-<input type="checkbox" name="<?php echo htmlspecialchars($this->group); ?>[auto_create_user]" id="http_authentication_auto_create_user"<?php if ($auto_create_user) echo ' checked="checked"' ?> value="1" /><br />
 Should a new user be created automatically if not already in the WordPress database?<br />
 Created users will obtain the role defined under &quot;New User Default Role&quot; on the <a href="options-general.php">General Options</a> page.
 <?php
@@ -161,9 +161,27 @@ Created users will obtain the role defined under &quot;New User Default Role&quo
 	 */
 	function _display_option_auto_create_email_domain() {
 		$auto_create_email_domain = $this->options['auto_create_email_domain'];
+		$this->_display_input_text_field('auto_create_email_domain', $auto_create_email_domain);
 ?>
-<input type="text" name="<?php echo htmlspecialchars($this->group); ?>[auto_create_email_domain]" id="http_authentication_auto_create_email_domain" value="<?php echo htmlspecialchars($auto_create_email_domain) ?>" size="50" /><br />
 When a new user logs in, this domain is used for the initial email address on their account. The user can change his or her email address by editing their profile.
+<?php
+	}
+
+	/*
+	 * Display a text input field.
+	 */
+	function _display_input_text_field($name, $value, $size = 75) {
+?>
+<input type="text" name="<?php echo htmlspecialchars($this->group); ?>[<?php echo htmlspecialchars($name); ?>]" id="http_authentication_<?php echo htmlspecialchars($name); ?>" value="<?php echo htmlspecialchars($value) ?>" size="<?php echo htmlspecialchars($size); ?>" /><br />
+<?php
+	}
+
+	/*
+	 * Display a checkbox field.
+	 */
+	function _display_checkbox_field($name, $value) {
+?>
+<input type="checkbox" name="<?php echo htmlspecialchars($this->group); ?>[<?php echo htmlspecialchars($name); ?>]" id="http_authentication_<?php echo htmlspecialchars($name); ?>"<?php if ($value) echo ' checked="checked"' ?> value="1" /><br />
 <?php
 	}
 }
