@@ -103,7 +103,7 @@ class HTTPAuthenticationOptionsPage {
 <input type="checkbox" name="<?php echo htmlspecialchars($this->group); ?>[allow_wp_auth]" id="http_authentication_allow_wp_auth"<?php if ($allow_wp_auth) echo ' checked="checked"' ?> value="1" /><br />
 Should the plugin fallback to WordPress authentication if none is found from the server?
 <?php
-		if ($allow_wp_auth && $this->options['login_uri'] == wp_login_url()) {
+		if ($allow_wp_auth && $this->options['login_uri'] == htmlspecialchars_decode(wp_login_url())) {
 			echo '<br /><strong>WARNING</strong>: You must set the login URI below to your external authentication system. Otherwise you will not be able to login!';
 		}
 	}
@@ -127,7 +127,7 @@ Default is <code>HTTP authentication</code>; override to use the name of your si
 		$login_uri = $this->options['login_uri'];
 ?>
 <input type="text" name="<?php echo htmlspecialchars($this->group); ?>[login_uri]" id="http_authentication_login_uri" value="<?php echo htmlspecialchars($login_uri) ?>" size="50" /><br />
-Default is <code><?php echo htmlspecialchars(wp_login_url()); ?></code>; override to direct users to a single sign-on system.<br />
+Default is <code><?php echo wp_login_url(); ?></code>; override to direct users to a single sign-on system.<br />
 The string <code>%s</code> will be replaced with the appropriate return URI as provided by WordPress.
 <?php
 	}
@@ -139,7 +139,7 @@ The string <code>%s</code> will be replaced with the appropriate return URI as p
 		$logout_uri = $this->options['logout_uri'];
 ?>
 <input type="text" name="<?php echo htmlspecialchars($this->group); ?>[logout_uri]" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-Default is <code><?php echo htmlspecialchars(wp_logout_url()); ?></code>; override to e.g. remove a cookie.<br />
+Default is <code><?php echo wp_logout_url(); ?></code>; override to e.g. remove a cookie.<br />
 The string <code>%s</code> will be replaced with your blog's home URI.
 <?php
 	}

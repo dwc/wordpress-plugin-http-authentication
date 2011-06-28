@@ -55,8 +55,8 @@ class HTTPAuthenticationPlugin {
 		$default_options = array(
 			'allow_wp_auth' => false,
 			'auth_label' => 'HTTP authentication',
-			'login_uri' => wp_login_url(),
-			'logout_uri' => wp_logout_url(),
+			'login_uri' => htmlspecialchars_decode(wp_login_url()),
+			'logout_uri' => htmlspecialchars_decode(wp_logout_url()),
 			'auto_create_user' => false,
 			'auto_create_email_domain' => '',
 		);
