@@ -85,16 +85,6 @@ class HTTPAuthenticationOptionsPage {
 	}
 
 	/*
-	 * Display the HTTP authentication database version option.
-	 */
-	function _display_option_db_version() {
-		$db_version = $this->options['db_version'];
-?>
-<input type="hidden" name="<?php echo htmlspecialchars($this->group); ?>[db_version]" id="http_authentication_db_version" value="<?php echo htmlspecialchars($db_version) ?>" />
-<?php
-	}
-
-	/*
 	 * Display the WordPress authentication checkbox.
 	 */
 	function _display_option_allow_wp_auth() {
