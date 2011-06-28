@@ -139,7 +139,7 @@ The string <code>%s</code> will be replaced with the appropriate return URI as p
 		$logout_uri = $this->options['logout_uri'];
 ?>
 <input type="text" name="<?php echo htmlspecialchars($this->group); ?>[logout_uri]" id="http_authentication_logout_uri" value="<?php echo htmlspecialchars($logout_uri) ?>" size="50" /><br />
-Default is <code><?php echo wp_logout_url(); ?></code>; override to e.g. remove a cookie.<br />
+Default is <code><?php echo htmlspecialchars(remove_query_arg('_wpnonce', htmlspecialchars_decode(wp_logout_url()))); ?></code>; override to e.g. remove a cookie.<br />
 The string <code>%s</code> will be replaced with your blog's home URI.
 <?php
 	}
