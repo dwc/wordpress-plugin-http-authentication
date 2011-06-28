@@ -19,7 +19,7 @@ class HTTPAuthenticationPlugin {
 		$this->options = get_option($this->option_name);
 
 		if (is_admin()) {
-			$options_page = new HTTPAuthenticationOptionsPage(&$this, 'http_authentication_options', __FILE__, $this->options);
+			$options_page = new HTTPAuthenticationOptionsPage(&$this, $this->option_name, __FILE__, $this->options);
 			add_action('admin_init', array(&$this, 'check_options'));
 		}
 
