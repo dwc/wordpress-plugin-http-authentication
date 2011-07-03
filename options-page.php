@@ -47,13 +47,7 @@ class HTTPAuthenticationOptionsPage {
 	 * Add an options page for this plugin.
 	 */
 	function add_options_page() {
-		if (function_exists('is_site_admin') && is_site_admin()) {
-			add_submenu_page('wpmu-admin.php', $this->title, $this->title, 'manage_options', $this->page, array(&$this, '_display_options_page'));
-			add_options_page($this->title, $this->title, 'manage_options', $this->page, array(&$this, '_display_options_page'));
-		}
-		else {
-			add_options_page($this->title, $this->title, 'manage_options', $this->page, array(&$this, '_display_options_page'));
-		}
+		add_options_page($this->title, $this->title, 'manage_options', $this->page, array(&$this, '_display_options_page'));
 	}
 
 	/*
