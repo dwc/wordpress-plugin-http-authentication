@@ -23,7 +23,8 @@ class HTTPAuthenticationPlugin {
 			add_action('admin_init', array(&$this, 'check_options'));
 		}
 
-		add_action('login_form', array(&$this, 'add_login_link'));
+		add_action('login_head', array(&$this, 'add_login_css'));
+		add_action('login_footer', array(&$this, 'add_login_link'));
 		add_action('check_passwords', array(&$this, 'generate_password'), 10, 3);
 		add_action('wp_logout', array(&$this, 'logout'));
 		add_filter('login_url', array(&$this, 'bypass_reauth'));
@@ -71,6 +72,19 @@ class HTTPAuthenticationPlugin {
 		}
 	}
 
+	function add_login_css() {
+?>
+<style type="text/css">
+p#http-authentication-link {
+	margin:	-5em auto 0 auto;
+	position: absolute;
+	text-align: center;
+	width: 100%;
+}
+</style>
+<?php
+	}
+
 	/*
 	 * Add a link to the login form to initiate external authentication.
 	 */
@@ -80,7 +94,7 @@ class HTTPAuthenticationPlugin {
 		$login_uri = sprintf($this->options['login_uri'], urlencode($redirect_to));
 		$auth_label = $this->options['auth_label'];
 
-		echo "\t" . '<p><a href="' . htmlspecialchars($login_uri) . '">Login with ' . htmlspecialchars($auth_label) . '</a></p>' . "\n";
+		echo "\t" . '<p id="http-authentication-link"><a class="button-primary" href="' . htmlspecialchars($login_uri) . '">Log In with ' . htmlspecialchars($auth_label) . '</a></p>' . "\n";
 	}
 
 	/*
