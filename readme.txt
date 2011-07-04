@@ -2,8 +2,8 @@
 Contributors: dwc
 Tags: authentication
 Requires at least: 3.0
-Tested up to: 3.0.1
-Stable tag: 3.2
+Tested up to: 3.1.4
+Stable tag: 4.0
 
 Use an external authentication source in WordPress.
 
@@ -67,7 +67,7 @@ This plugin doesn't actually authenticate users. It simply feeds WordPress the n
 
 To determine the username, this plugin uses the `REMOTE_USER` or the `REDIRECT_REMOTE_USER` environment variable, which is set by many Apache authentication modules. If someone can find a way to spoof this value, this plugin is not guaranteed to be secure.
 
-This plugin generates a random password each time you create a user or edit an existing user's profile. However, since this plugin requires an external authentication mechanism, this password is not requested by WordPress. Generating a random password helps protect accounts, preventing one authorized user from pretending to be another.
+By default, this plugin generates a random password each time you create a user or edit an existing user's profile. However, since this plugin requires an external authentication mechanism, this password is not requested by WordPress. Generating a random password helps protect accounts, preventing one authorized user from pretending to be another.
 
 = If I disable this plugin, how will I login? =
 
@@ -77,10 +77,39 @@ Also, you should leave the `admin` user as a fallback, i.e. create a new account
 
 In the worst case scenario, you may have to use phpMyAdmin or the MySQL command line to [reset a user's password](http://codex.wordpress.org/Resetting_Your_Password).
 
+= Can I configure the plugin to support standard WordPress logins? =
+
+Yes. You can authenticate some users via an external, single sign-on system and other users via the built-in username and password combination. (Note: When mixed authentication is in use, this plugin does not scramble passwords as described above.)
+
+When you configure your external authentication system, make sure that you allow users in even if they have not authenticated externally. Using [Shibboleth](http://shibboleth.internet2.edu/) as an example:
+
+`AuthName "Shibboleth"
+AuthType Shibboleth
+Require Shibboleth`
+
+This enables Shibboleth authentication in ["passive" mode](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPProtectContent).
+
+Then, in WordPress:
+1. Set the plugin to allow WordPress authentication.
+2. Configure the login URI to match your Shibboleth system. For example, if your blog is hosted at `http://example.com/`, then your login URI should be `http://example.com/Shibboleth.sso/Login?target=%s`.
+3. Configure the logout URI to match your Shibboleth system. Following the above example, your logout URI would be `http://example.com/Shibboleth.sso/Logout?return=%s`.
+
+After saving the options, authentication will work as follows:
+* If a user is already authenticated via Shibboleth, and he or she exists in the WordPress database, this plugin will log them in automatically.
+* If a user is not authenticated via Shibboleth, the plugin will present the standard WordPress login form with an additional link to login via Shibboleth.
+
+Other authentication systems (particularly those without a login or logout URI) will need to be configured differently.
+
+= Does this plugin support multisite (WordPress MU) setups? =
+
+Yes, you can enable this plugin across a network or on individual sites. However, options will need to be set on individual sites.
+
+If you have suggestions on how to improve network support, please comment.
+
 == Changelog ==
 
 = 4.0 =
-* Allow the plugin to fallback to WordPress password authentication
+* Restore (and improve) support for falling back to WordPress password authentication
 * Remove migration of old options format (we'll assume enough people have upgraded)
 
 = 3.3 =
