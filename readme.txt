@@ -104,6 +104,11 @@ Yes, you can enable this plugin across a network or on individual sites. However
 
 If you have suggestions on how to improve network support, please submit a comment.
 
+== Screenshots ==
+
+1. Plugin options, allowing WordPress authentication
+2. WordPress login form with external authentication link
+
 == Changelog ==
 
 = 4.0 =
