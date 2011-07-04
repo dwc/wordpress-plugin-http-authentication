@@ -14,7 +14,7 @@ The HTTP Authentication plugin allows you to use existing means of authenticatin
 == Installation ==
 
 1. Login as an existing user, such as admin.
-2. Upload `http-authentication.php` to your plugins folder, usually `wp-content/plugins`.
+2. Upload the `http-authentication` folder to your plugins folder, usually `wp-content/plugins`. (Or simply via the built-in installer.)
 3. Activate the plugin on the Plugins screen.
 4. Add one or more users to WordPress, specifying the external username for the Nickname field. Also be sure to set the role for each user.
 5. Logout.
@@ -24,8 +24,6 @@ The HTTP Authentication plugin allows you to use existing means of authenticatin
 Note: This version works with WordPress 3.0 and above. Use the following for older versions of WordPress:
 * Wordpress 2.0: [Version 1.8](http://downloads.wordpress.org/plugin/http-authentication.1.8.zip)
 * Wordpress 2.5 through 2.9.x: [Version 2.4](http://downloads.wordpress.org/plugin/http-authentication.2.4.zip)
-
-This plugin also supports WordPress MU as of version 2.4. You can install it globally or on a per-site basis. Refer to the WordPress MU documentation for more information on installing plugins.
 
 == Frequently Asked Questions ==
 
@@ -38,7 +36,6 @@ Any authentication mechanism which sets the `REMOTE_USER` (or `REDIRECT_REMOTE_U
 This depends on your hosting environment and your means of authentication.
 
 Many Apache installations allow configuration of authentication via `.htaccess` files, while some do not. Try adding the following to your blog's top-level `.htaccess` file:
-
 `<Files wp-login.php>
 AuthName "WordPress"
 AuthType Basic
@@ -49,7 +46,6 @@ Require user dwc
 (You may also want to protect your `xmlrpc.php` file, which uses separate authentication code.)
 
 Then, create another `.htaccess` file in your `wp-admin` directory with the following contents:
-
 `AuthName "WordPress"
 AuthType Basic
 AuthUserFile /path/to/passwords
@@ -82,7 +78,6 @@ In the worst case scenario, you may have to use phpMyAdmin or the MySQL command 
 Yes. You can authenticate some users via an external, single sign-on system and other users via the built-in username and password combination. (Note: When mixed authentication is in use, this plugin does not scramble passwords as described above.)
 
 When you configure your external authentication system, make sure that you allow users in even if they have not authenticated externally. Using [Shibboleth](http://shibboleth.internet2.edu/) as an example:
-
 `AuthName "Shibboleth"
 AuthType Shibboleth
 Require Shibboleth`
