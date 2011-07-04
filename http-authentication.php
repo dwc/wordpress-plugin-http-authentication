@@ -2,7 +2,7 @@
 /*
 Plugin Name: HTTP Authentication
 Version: 4.0
-Plugin URI: https://dev.webadmin.ufl.edu/~dwc/2010/07/13/http-authentication-3-0/
+Plugin URI: https://dev.webadmin.ufl.edu/~dwc/2011/07/04/http-authentication-4-0/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
 Author URI: https://dev.webadmin.ufl.edu/~dwc/
