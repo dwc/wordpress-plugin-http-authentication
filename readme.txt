@@ -22,6 +22,7 @@ The HTTP Authentication plugin allows you to use existing means of authenticatin
 7. Try logging in as one of the users added in step 4.
 
 Note: This version works with WordPress 3.0 and above. Use the following for older versions of WordPress:
+
 * Wordpress 2.0: [Version 1.8](http://downloads.wordpress.org/plugin/http-authentication.1.8.zip)
 * Wordpress 2.5 through 2.9.x: [Version 2.4](http://downloads.wordpress.org/plugin/http-authentication.2.4.zip)
 
@@ -85,11 +86,13 @@ Require Shibboleth`
 This enables Shibboleth authentication in ["passive" mode](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPProtectContent).
 
 Then, in WordPress:
+
 1. Set the plugin to allow WordPress authentication.
 2. Configure the login URI to match your Shibboleth system. For example, if your blog is hosted at `http://example.com/`, then your login URI should be `http://example.com/Shibboleth.sso/Login?target=%s`.
 3. Configure the logout URI to match your Shibboleth system. Following the above example, your logout URI would be `http://example.com/Shibboleth.sso/Logout?return=%s`.
 
 After saving the options, authentication will work as follows:
+
 * If a user is already authenticated via Shibboleth, and he or she exists in the WordPress database, this plugin will log them in automatically.
 * If a user is not authenticated via Shibboleth, the plugin will present the standard WordPress login form with an additional link to login via Shibboleth.
 
