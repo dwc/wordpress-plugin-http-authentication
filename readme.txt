@@ -102,7 +102,7 @@ Other authentication systems (particularly those without a login or logout URI) 
 
 Yes, you can enable this plugin across a network or on individual sites. However, options will need to be set on individual sites.
 
-If you have suggestions on how to improve network support, please comment.
+If you have suggestions on how to improve network support, please submit a comment.
 
 == Changelog ==
 
