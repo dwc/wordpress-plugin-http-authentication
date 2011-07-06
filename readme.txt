@@ -121,6 +121,7 @@ If you have suggestions on how to improve network support, please submit a comme
 
 = 4.1 =
 * Declare support for WordPress 3.2
+* Update screenshots for WordPress 3.2
 
 = 4.0 =
 * Restore (and improve) support for falling back to WordPress password authentication
