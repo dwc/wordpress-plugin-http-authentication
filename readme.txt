@@ -2,14 +2,22 @@
 Contributors: dwc
 Tags: authentication
 Requires at least: 3.0
-Tested up to: 3.1.4
-Stable tag: 4.0
+Tested up to: 3.2
+Stable tag: 4.1
 
 Use an external authentication source in WordPress.
 
 == Description ==
 
-The HTTP Authentication plugin allows you to use existing means of authenticating people to WordPress. This includes Apache's basic HTTP authentication module and many others.
+The HTTP Authentication plugin allows you to use existing means of authenticating people to WordPress. This includes Apache's basic HTTP authentication module, [Shibboleth](http://shibboleth.internet2.edu/), and many others.
+
+To follow updates to this plugin, visit:
+
+https://dev.webadmin.ufl.edu/~dwc/
+
+For help with this version, visit:
+
+https://dev.webadmin.ufl.edu/~dwc/2011/07/04/http-authentication-4-0/
 
 == Installation ==
 
@@ -111,6 +119,9 @@ If you have suggestions on how to improve network support, please submit a comme
 
 == Changelog ==
 
+= 4.1 =
+* Declare support for WordPress 3.2
+
 = 4.0 =
 * Restore (and improve) support for falling back to WordPress password authentication
 * Remove migration of old options format (we'll assume enough people have upgraded)
@@ -134,3 +145,8 @@ If you have suggestions on how to improve network support, please submit a comme
 = 2.4 =
 * Add support for WordPress MU (Elliot Kendall)
 * Allow for mixed HTTP and built-in authentication by falling back to wp-login.php (Elliot Kendall)
+
+== Upgrade Notice ==
+
+= 4.1 =
+Minor update for WordPress 3.2
