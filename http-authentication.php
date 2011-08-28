@@ -91,7 +91,7 @@ p#http-authentication-link {
 	function add_login_link() {
 		global $redirect_to;
 
-		$login_uri = $this->_generate_uri($this->options['login_uri'], $redirect_to);
+		$login_uri = $this->_generate_uri($this->options['login_uri'], wp_login_url($redirect_to));
 		$auth_label = $this->options['auth_label'];
 
 		echo "\t" . '<p id="http-authentication-link"><a class="button-primary" href="' . htmlspecialchars($login_uri) . '">Log In with ' . htmlspecialchars($auth_label) . '</a></p>' . "\n";
