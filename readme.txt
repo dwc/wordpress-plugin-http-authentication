@@ -2,8 +2,8 @@
 Contributors: dwc
 Tags: authentication
 Requires at least: 3.0
-Tested up to: 3.2
-Stable tag: 4.1
+Tested up to: 3.2.1
+Stable tag: 4.2
 
 Use an external authentication source in WordPress.
 
@@ -96,8 +96,8 @@ This enables Shibboleth authentication in ["passive" mode](https://wiki.shibbole
 Then, in WordPress:
 
 1. Set the plugin to allow WordPress authentication.
-2. Configure the login URI to match your Shibboleth system. For example, if your blog is hosted at `http://example.com/`, then your login URI should be `http://example.com/Shibboleth.sso/Login?target=%s`.
-3. Configure the logout URI to match your Shibboleth system. Following the above example, your logout URI would be `http://example.com/Shibboleth.sso/Logout?return=%s`.
+2. Configure the login URI to match your Shibboleth system. For example, if your blog is hosted at `http://example.com/`, then your login URI should be `http://example.com/Shibboleth.sso/Login?target=%redirect_encoded%`.
+3. Configure the logout URI to match your Shibboleth system. Following the above example, your logout URI would be `http://example.com/Shibboleth.sso/Logout?return=%redirect_encoded%`.
 
 After saving the options, authentication will work as follows:
 
@@ -112,12 +112,33 @@ Yes, you can enable this plugin across a network or on individual sites. However
 
 If you have suggestions on how to improve network support, please submit a comment.
 
+= How do you handle staged deployments (dev, test, prod) with the plugin? =
+
+If you have a WordPress site with multiple environments (e.g. `dev.example.com`, `test.example.com`, and `example.com`) you can use additional variables in the login and logout URIs:
+
+* `%host%` - The current value of `$_SERVER['HTTP_HOST']`
+* `%site%` - The WordPress home URI
+* `%redirect%` - The return URI provided by WordPress
+
+You can also use %host_encoded%, %site_encoded%, and %redirect_encoded% for URL-encoded values.
+
+For example, your login URI could be:
+
+`https://%host%/Shibboleth.sso/Login?target=%redirect_encoded%`
+
+This would be modified for each environment as appropriate.
+
 == Screenshots ==
 
 1. Plugin options, allowing WordPress authentication
 2. WordPress login form with external authentication link
 
 == Changelog ==
+
+= 4.2 =
+* Declare support for WordPress 3.2.1
+* Extend variable replacement for staged deployments
+* Wrap redirect parameter on login to force us through `wp-login.php` so we can check the external authentication (thanks to Josh Larios)
 
 = 4.1 =
 * Declare support for WordPress 3.2
