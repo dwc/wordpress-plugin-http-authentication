@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 4.1
+Version: 4.2
 Plugin URI: https://dev.webadmin.ufl.edu/~dwc/2011/07/04/http-authentication-4-0/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -91,7 +91,7 @@ p#http-authentication-link {
 	function add_login_link() {
 		global $redirect_to;
 
-		$login_uri = sprintf($this->options['login_uri'], urlencode($redirect_to));
+		$login_uri = $this->_generate_uri($this->options['login_uri'], $redirect_to);
 		$auth_label = $this->options['auth_label'];
 
 		echo "\t" . '<p id="http-authentication-link"><a class="button-primary" href="' . htmlspecialchars($login_uri) . '">Log In with ' . htmlspecialchars($auth_label) . '</a></p>' . "\n";
@@ -112,7 +112,7 @@ p#http-authentication-link {
 	 * Logout the user by redirecting them to the logout URI.
 	 */
 	function logout() {
-		$logout_uri = sprintf($this->options['logout_uri'], urlencode(home_url()));
+		$logout_uri = $this->_generate_uri($this->options['logout_uri'], home_url());
 
 		wp_redirect($logout_uri);
 		exit();
@@ -206,6 +206,30 @@ p#http-authentication-link {
 		$user = get_user_by('id', $user_id);
 
 		return $user;
+	}
+
+	/*
+	 * Fill the specified URI with the site URI and the specified return location.
+	 */
+	function _generate_uri($uri, $redirect_to) {
+		// Support tags for staged deployments
+		$tags = array(
+			'host' => $_SERVER['HTTP_HOST'],
+			'site' => home_url(),
+			'redirect' => $redirect_to,
+		);
+
+		foreach ($tags as $tag => $value) {
+			$uri = str_replace('%' . $tag . '%', $value, $uri);
+			$uri = str_replace('%' . $tag . '_encoded%', urlencode($value), $uri);
+		}
+
+		// Support previous versions with only the %s tag
+		if (strstr($uri, '%s') !== false) {
+			$uri = sprintf($uri, urlencode($redirect_to));
+		}
+
+		return $uri;
 	}
 }
 
