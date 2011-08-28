@@ -213,8 +213,11 @@ p#http-authentication-link {
 	 */
 	function _generate_uri($uri, $redirect_to) {
 		// Support tags for staged deployments
+		$base = $this->_get_base_url();
+
 		$tags = array(
 			'host' => $_SERVER['HTTP_HOST'],
+			'base' => $base,
 			'site' => home_url(),
 			'redirect' => $redirect_to,
 		);
@@ -230,6 +233,16 @@ p#http-authentication-link {
 		}
 
 		return $uri;
+	}
+
+	/*
+	 * Return the base domain URL based on the WordPress home URL.
+	 */
+	function _get_base_url() {
+		$home = parse_url(home_url());
+		$base = str_replace(array($home['path'], $home['query'], $home['fragment']), '', home_url());
+
+		return $base;
 	}
 }
 

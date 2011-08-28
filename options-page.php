@@ -63,6 +63,7 @@ class HTTPAuthenticationOptionsPage {
   <p>For the Login URI and Logout URI options, you can use the following variables to support your installation:</p>
   <ul>
     <li><code>%host%</code> - The current value of <code>$_SERVER['HTTP_HOST']</code></li>
+    <li><code>%base%</code> - The base domain URL (everything before the path)</li>
     <li><code>%site%</code> - The WordPress home URI</li>
     <li><code>%redirect%</code> - The return URI provided by WordPress</li>
   </ul>
@@ -119,7 +120,7 @@ Default is <code>HTTP authentication</code>; override to use the name of your si
 		$this->_display_input_text_field('login_uri', $login_uri);
 ?>
 Default is <code><?php echo wp_login_url(); ?></code>; override to direct users to a single sign-on system. See above for available variables.<br />
-Example: <code>https://%host%/Shibboleth.sso/Login?target=%redirect_encoded%</code>
+Example: <code>%base%/Shibboleth.sso/Login?target=%redirect_encoded%</code>
 <?php
 	}
 
@@ -131,7 +132,7 @@ Example: <code>https://%host%/Shibboleth.sso/Login?target=%redirect_encoded%</co
 		$this->_display_input_text_field('logout_uri', $logout_uri);
 ?>
 Default is <code><?php echo htmlspecialchars(remove_query_arg('_wpnonce', htmlspecialchars_decode(wp_logout_url()))); ?></code>; override to e.g. remove a cookie. See above for available variables.<br />
-Example: <code>https://%host%/Shibboleth.sso/Logout?return=%redirect_encoded%</code>
+Example: <code>%base%/Shibboleth.sso/Logout?return=%redirect_encoded%</code>
 <?php
 	}
 

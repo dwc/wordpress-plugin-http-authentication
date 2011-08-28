@@ -117,6 +117,7 @@ If you have suggestions on how to improve network support, please submit a comme
 If you have a WordPress site with multiple environments (e.g. `dev.example.com`, `test.example.com`, and `example.com`) you can use additional variables in the login and logout URIs:
 
 * `%host%` - The current value of `$_SERVER['HTTP_HOST']`
+* `%base%` - The base domain URL (everything before the path)
 * `%site%` - The WordPress home URI
 * `%redirect%` - The return URI provided by WordPress
 
