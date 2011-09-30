@@ -13,11 +13,11 @@ The HTTP Authentication plugin allows you to use existing means of authenticatin
 
 To follow updates to this plugin, visit:
 
-https://dev.webadmin.ufl.edu/~dwc/
+http://danieltwc.com/
 
 For help with this version, visit:
 
-https://dev.webadmin.ufl.edu/~dwc/2011/07/04/http-authentication-4-0/
+http://danieltwc.com/2011/http-authentication-4-0/
 
 == Installation ==
 
