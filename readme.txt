@@ -3,7 +3,7 @@ Contributors: dwc
 Tags: authentication
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 4.2
+Stable tag: 4.3
 
 Use an external authentication source in WordPress.
 
@@ -121,7 +121,7 @@ If you have a WordPress site with multiple environments (e.g. `dev.example.com`,
 * `%site%` - The WordPress home URI
 * `%redirect%` - The return URI provided by WordPress
 
-You can also use %host_encoded%, %site_encoded%, and %redirect_encoded% for URL-encoded values.
+You can also use `%host_encoded%`, `%site_encoded%`, and `%redirect_encoded%` for URL-encoded values.
 
 For example, your login URI could be:
 
@@ -135,6 +135,9 @@ This would be modified for each environment as appropriate.
 2. WordPress login form with external authentication link
 
 == Changelog ==
+
+= 4.3 =
+* Update plugin URIs
 
 = 4.2 =
 * Declare support for WordPress 3.2.1
@@ -170,6 +173,12 @@ This would be modified for each environment as appropriate.
 * Allow for mixed HTTP and built-in authentication by falling back to wp-login.php (Elliot Kendall)
 
 == Upgrade Notice ==
+
+= 4.3 =
+No code changes; updating plugin URIs
+
+= 4.2 =
+Extends support for variable replacement
 
 = 4.1 =
 Minor update for WordPress 3.2
