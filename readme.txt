@@ -2,8 +2,8 @@
 Contributors: dwc
 Tags: authentication
 Requires at least: 3.0
-Tested up to: 3.2.1
-Stable tag: 4.3
+Tested up to: 3.3.1
+Stable tag: 4.4
 
 Use an external authentication source in WordPress.
 
@@ -135,6 +135,9 @@ This would be modified for each environment as appropriate.
 2. WordPress login form with external authentication link
 
 == Changelog ==
+
+= 4.4 =
+* Update CSS to correctly center login button on WordPress 3.3
 
 = 4.3 =
 * Update plugin URIs
