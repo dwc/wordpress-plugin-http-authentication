@@ -177,6 +177,9 @@ This would be modified for each environment as appropriate.
 
 == Upgrade Notice ==
 
+= 4.4 =
+Minor CSS fix for WordPress 3.3
+
 = 4.3 =
 No code changes; updating plugin URIs
 
