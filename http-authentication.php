@@ -42,11 +42,11 @@ class HTTPAuthenticationPlugin {
 				$this->options = array();
 			}
 
-                        $current_db_version = isset($this->options['db_version']) ? $this->options['db_version'] : 0;
+			$current_db_version = isset($this->options['db_version']) ? $this->options['db_version'] : 0;
 			$this->upgrade($current_db_version);
 			$this->options['db_version'] = $this->db_version;
 			update_option($this->option_name, $this->options);
-                }
+		}
 	}
 
 	/*
@@ -244,7 +244,12 @@ p#http-authentication-link a {
 	 */
 	function _get_base_url() {
 		$home = parse_url(home_url());
-		$base = str_replace(array($home['path'], $home['query'], $home['fragment']), '', home_url());
+
+		$base = home_url();
+		foreach (array('path', 'query', 'fragment') as $key) {
+			if (! isset($home[$key])) continue;
+			$base = str_replace($home[$key], '', $base);
+		}
 
 		return $base;
 	}

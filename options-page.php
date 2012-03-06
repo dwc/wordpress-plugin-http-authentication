@@ -39,6 +39,8 @@ class HTTPAuthenticationOptionsPage {
 	function sanitize_settings($input) {
 		$output = $input;
 		$output['db_version'] = $this->plugin->db_version;
+		$output['allow_wp_auth'] = isset($input['allow_wp_auth']) ? (bool) $input['allow_wp_auth'] : false;
+		$output['auto_create_user'] = isset($input['auto_create_user']) ? (bool) $input['auto_create_user'] : false;
 
 		return $output;
 	}

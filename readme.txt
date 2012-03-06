@@ -136,6 +136,9 @@ This would be modified for each environment as appropriate.
 
 == Changelog ==
 
+= 4.5 =
+* Avoid some PHP notices due to saving options (William Schneider)
+
 = 4.4 =
 * Update CSS to correctly center login button on WordPress 3.3
 
