@@ -11,7 +11,7 @@ Author URI: http://danieltwc.com/
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'options-page.php');
 
 class HTTPAuthenticationPlugin {
-	var $db_version = 1;
+	var $db_version = 2;
 	var $option_name = 'http_authentication_options';
 	var $options;
 
@@ -58,6 +58,7 @@ class HTTPAuthenticationPlugin {
 			'auth_label' => 'HTTP authentication',
 			'login_uri' => htmlspecialchars_decode(wp_login_url()),
 			'logout_uri' => remove_query_arg('_wpnonce', htmlspecialchars_decode(wp_logout_url())),
+			'additional_server_keys' => '',
 			'auto_create_user' => false,
 			'auto_create_email_domain' => '',
 		);
@@ -76,14 +77,14 @@ class HTTPAuthenticationPlugin {
 ?>
 <style type="text/css">
 p#http-authentication-link {
-	width: 100%;
-    height: 4em;
-    text-align: center;
-    margin-top: 2em;
+  width: 100%;
+  height: 4em;
+  text-align: center;
+  margin-top: 2em;
 }
 p#http-authentication-link a {
-    margin: 0 auto;
-    float: none;
+  margin: 0 auto;
+  float: none;
 }
 </style>
 <?php
@@ -173,14 +174,15 @@ p#http-authentication-link a {
 	function check_remote_user() {
 		$username = '';
 
-		foreach (array('REMOTE_USER', 'REDIRECT_REMOTE_USER') as $key) {
-			if (! empty($_SERVER[$key])) {
-				$username = $_SERVER[$key];
+		$server_keys = $this->_get_server_keys();
+		foreach ($server_keys as $server_key) {
+			if (! empty($_SERVER[$server_key])) {
+				$username = $_SERVER[$server_key];
 			}
 		}
 
 		if (! $username) {
-			return new WP_Error('empty_username', '<strong>ERROR</strong>: No REMOTE_USER or REDIRECT_REMOTE_USER found.');
+			return new WP_Error('empty_username', '<strong>ERROR</strong>: No user found in server variables.');
 		}
 
 		// Create new users automatically, if configured
@@ -196,6 +198,23 @@ p#http-authentication-link a {
 		}
 
 		return $user;
+	}
+
+	/*
+	 * Return the list of $_SERVER keys that we will check for a username. By
+	 * default, these are REMOTE_USER and REDIRECT_REMOTE_USER. Additional keys
+	 * can be configured from the options page.
+	 */
+	function _get_server_keys() {
+		$server_keys = array('REMOTE_USER', 'REDIRECT_REMOTE_USER');
+
+		$additional_server_keys = $this->options['additional_server_keys'];
+		if (! empty($additional_server_keys)) {
+			$keys = preg_split('/,\s*/', $additional_server_keys);
+			$server_keys = array_merge($server_keys, $keys);
+		}
+
+		return $server_keys;
 	}
 
 	/*

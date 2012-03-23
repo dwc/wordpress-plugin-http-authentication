@@ -139,6 +139,7 @@ This would be modified for each environment as appropriate.
 = 4.5 =
 * Avoid some PHP notices due to saving options (William Schneider)
 * Fix for redirect loop on some multisite setups (#1497)
+* Add option to support additional $_SERVER variables in authentication (#1477)
 
 = 4.4 =
 * Update CSS to correctly center login button on WordPress 3.3

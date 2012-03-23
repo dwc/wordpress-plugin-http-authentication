@@ -29,6 +29,7 @@ class HTTPAuthenticationOptionsPage {
 		add_settings_field('http_authentication_auth_label', 'Authentication label', array(&$this, '_display_option_auth_label'), $this->page, $section);
 		add_settings_field('http_authentication_login_uri', 'Login URI', array(&$this, '_display_option_login_uri'), $this->page, $section);
 		add_settings_field('http_authentication_logout_uri', 'Logout URI', array(&$this, '_display_option_logout_uri'), $this->page, $section);
+		add_settings_field('http_authentication_additional_server_keys', '$_SERVER variables', array(&$this, '_display_option_additional_server_keys'), $this->page, $section);
 		add_settings_field('http_authentication_auto_create_user', 'Automatically create accounts?', array(&$this, '_display_option_auto_create_user'), $this->page, $section);
 		add_settings_field('http_authentication_auto_create_email_domain', 'Email address domain', array(&$this, '_display_option_auto_create_email_domain'), $this->page, $section);
 	}
@@ -135,6 +136,18 @@ Example: <code>%base%/Shibboleth.sso/Login?target=%redirect_encoded%</code>
 ?>
 Default is <code><?php echo htmlspecialchars(remove_query_arg('_wpnonce', htmlspecialchars_decode(wp_logout_url()))); ?></code>; override to e.g. remove a cookie. See above for available variables.<br />
 Example: <code>%base%/Shibboleth.sso/Logout?return=%redirect_encoded%</code>
+<?php
+	}
+
+	/*
+	 * Display the additional $_SERVER keys field.
+	 */
+	function _display_option_additional_server_keys() {
+		$additional_server_keys = $this->options['additional_server_keys'];
+		$this->_display_input_text_field('additional_server_keys', $additional_server_keys);
+?>
+<code>$_SERVER</code> variables in addition to <code>REMOTE_USER</code> and <code>REDIRECT_REMOTE_USER</code> to check for the username value, separated by a comma. Use this to e.g. support personal X.509 certificates for authentication.<br />
+Example: <code>SSL_CLIENT_S_DN_CN</code>
 <?php
 	}
 
