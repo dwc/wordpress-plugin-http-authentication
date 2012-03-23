@@ -174,7 +174,7 @@ p#http-authentication-link a {
 		$username = '';
 
 		foreach (array('REMOTE_USER', 'REDIRECT_REMOTE_USER') as $key) {
-			if (isset($_SERVER[$key])) {
+			if (! empty($_SERVER[$key])) {
 				$username = $_SERVER[$key];
 			}
 		}
