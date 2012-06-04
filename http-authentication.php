@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: HTTP Authentication
-Version: 4.4
+Version: 4.5
 Plugin URI: http://danieltwc.com/2011/http-authentication-4-0/
 Description: Authenticate users using basic HTTP authentication (<code>REMOTE_USER</code>). This plugin assumes users are externally authenticated, as with <a href="http://www.gatorlink.ufl.edu/">GatorLink</a>.
 Author: Daniel Westermann-Clark
@@ -19,18 +19,18 @@ class HTTPAuthenticationPlugin {
 		$this->options = get_option($this->option_name);
 
 		if (is_admin()) {
-			$options_page = new HTTPAuthenticationOptionsPage(&$this, $this->option_name, __FILE__, $this->options);
-			add_action('admin_init', array(&$this, 'check_options'));
+			$options_page = new HTTPAuthenticationOptionsPage($this, $this->option_name, __FILE__, $this->options);
+			add_action('admin_init', array($this, 'check_options'));
 		}
 
-		add_action('login_head', array(&$this, 'add_login_css'));
-		add_action('login_footer', array(&$this, 'add_login_link'));
-		add_action('check_passwords', array(&$this, 'generate_password'), 10, 3);
-		add_action('wp_logout', array(&$this, 'logout'));
-		add_filter('login_url', array(&$this, 'bypass_reauth'));
-		add_filter('show_password_fields', array(&$this, 'allow_wp_auth'));
-		add_filter('allow_password_reset', array(&$this, 'allow_wp_auth'));
-		add_filter('authenticate', array(&$this, 'authenticate'), 10, 3);
+		add_action('login_head', array($this, 'add_login_css'));
+		add_action('login_footer', array($this, 'add_login_link'));
+		add_action('check_passwords', array($this, 'generate_password'), 10, 3);
+		add_action('wp_logout', array($this, 'logout'));
+		add_filter('login_url', array($this, 'bypass_reauth'));
+		add_filter('show_password_fields', array($this, 'allow_wp_auth'));
+		add_filter('allow_password_reset', array($this, 'allow_wp_auth'));
+		add_filter('authenticate', array($this, 'authenticate'), 10, 3);
 	}
 
 	/*

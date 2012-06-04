@@ -13,25 +13,25 @@ class HTTPAuthenticationOptionsPage {
 		$this->options = $options;
 		$this->title = $title;
 
-		add_action('admin_init', array(&$this, 'register_options'));
-		add_action('admin_menu', array(&$this, 'add_options_page'));
+		add_action('admin_init', array($this, 'register_options'));
+		add_action('admin_menu', array($this, 'add_options_page'));
 	}
 
 	/*
 	 * Register the options for this plugin so they can be displayed and updated below.
 	 */
 	function register_options() {
-		register_setting($this->group, $this->group, array(&$this, 'sanitize_settings'));
+		register_setting($this->group, $this->group, array($this, 'sanitize_settings'));
 
 		$section = 'http_authentication_main';
-		add_settings_section($section, 'Main Options', array(&$this, '_display_options_section'), $this->page);
-		add_settings_field('http_authentication_allow_wp_auth', 'Allow WordPress authentication?', array(&$this, '_display_option_allow_wp_auth'), $this->page, $section);
-		add_settings_field('http_authentication_auth_label', 'Authentication label', array(&$this, '_display_option_auth_label'), $this->page, $section);
-		add_settings_field('http_authentication_login_uri', 'Login URI', array(&$this, '_display_option_login_uri'), $this->page, $section);
-		add_settings_field('http_authentication_logout_uri', 'Logout URI', array(&$this, '_display_option_logout_uri'), $this->page, $section);
-		add_settings_field('http_authentication_additional_server_keys', '$_SERVER variables', array(&$this, '_display_option_additional_server_keys'), $this->page, $section);
-		add_settings_field('http_authentication_auto_create_user', 'Automatically create accounts?', array(&$this, '_display_option_auto_create_user'), $this->page, $section);
-		add_settings_field('http_authentication_auto_create_email_domain', 'Email address domain', array(&$this, '_display_option_auto_create_email_domain'), $this->page, $section);
+		add_settings_section($section, 'Main Options', array($this, '_display_options_section'), $this->page);
+		add_settings_field('http_authentication_allow_wp_auth', 'Allow WordPress authentication?', array($this, '_display_option_allow_wp_auth'), $this->page, $section);
+		add_settings_field('http_authentication_auth_label', 'Authentication label', array($this, '_display_option_auth_label'), $this->page, $section);
+		add_settings_field('http_authentication_login_uri', 'Login URI', array($this, '_display_option_login_uri'), $this->page, $section);
+		add_settings_field('http_authentication_logout_uri', 'Logout URI', array($this, '_display_option_logout_uri'), $this->page, $section);
+		add_settings_field('http_authentication_additional_server_keys', '$_SERVER variables', array($this, '_display_option_additional_server_keys'), $this->page, $section);
+		add_settings_field('http_authentication_auto_create_user', 'Automatically create accounts?', array($this, '_display_option_auto_create_user'), $this->page, $section);
+		add_settings_field('http_authentication_auto_create_email_domain', 'Email address domain', array($this, '_display_option_auto_create_email_domain'), $this->page, $section);
 	}
 
 	/*
@@ -50,7 +50,7 @@ class HTTPAuthenticationOptionsPage {
 	 * Add an options page for this plugin.
 	 */
 	function add_options_page() {
-		add_options_page($this->title, $this->title, 'manage_options', $this->page, array(&$this, '_display_options_page'));
+		add_options_page($this->title, $this->title, 'manage_options', $this->page, array($this, '_display_options_page'));
 	}
 
 	/*

@@ -140,6 +140,7 @@ This would be modified for each environment as appropriate.
 * Avoid some PHP notices due to saving options (William Schneider)
 * Fix for redirect loop on some multisite setups (#1497)
 * Add option to support additional $_SERVER variables in authentication (#1477)
+* Remove use of call-time pass by reference to avoid warnings on PHP 5.3 and newer
 
 = 4.4 =
 * Update CSS to correctly center login button on WordPress 3.3
@@ -181,6 +182,9 @@ This would be modified for each environment as appropriate.
 * Allow for mixed HTTP and built-in authentication by falling back to wp-login.php (Elliot Kendall)
 
 == Upgrade Notice ==
+
+= 4.5 =
+Avoid some PHP errors and warnings; add support for choosing $_SERVER variables
 
 = 4.4 =
 Minor CSS fix for WordPress 3.3
