@@ -142,6 +142,7 @@ This would be modified for each environment as appropriate.
 * Add option to support additional $_SERVER variables in authentication (#1477)
 * Remove use of call-time pass by reference to avoid warnings on PHP 5.3 and newer
 * Fix deprecation notice in WordPress 3.3 on `get_userdatabylogin` (#1513)
+* Associate options page label tags with their input fields (#1514)
 
 = 4.4 =
 * Update CSS to correctly center login button on WordPress 3.3
