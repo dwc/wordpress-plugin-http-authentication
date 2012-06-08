@@ -24,7 +24,7 @@ http://danieltwc.com/2011/http-authentication-4-0/
 1. Login as an existing user, such as admin.
 2. Upload the `http-authentication` folder to your plugins folder, usually `wp-content/plugins`. (Or simply via the built-in installer.)
 3. Activate the plugin on the Plugins screen.
-4. Add one or more users to WordPress, specifying the external username for the Nickname field. Also be sure to set the role for each user.
+4. Add one or more users to WordPress, specifying the external username for the "Username" field. Also be sure to set the role for each user.
 5. Logout.
 6. Protect `wp-login.php` and `wp-admin` using your external authentication (using, for example, `.htaccess` files).
 7. Try logging in as one of the users added in step 4.
