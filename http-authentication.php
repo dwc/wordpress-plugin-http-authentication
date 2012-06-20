@@ -224,7 +224,6 @@ p#http-authentication-link a {
 		$password = wp_generate_password();
 		$email_domain = $this->options['auto_create_email_domain'];
 
-		require_once(WPINC . DIRECTORY_SEPARATOR . 'registration.php');
 		$user_id = wp_create_user($username, $password, $username . ($email_domain ? '@' . $email_domain : ''));
 		$user = get_user_by('id', $user_id);
 

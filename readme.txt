@@ -1,8 +1,8 @@
 === HTTP Authentication ===
 Contributors: dwc
 Tags: authentication
-Requires at least: 3.0
-Tested up to: 3.3.1
+Requires at least: 3.1
+Tested up to: 3.4
 Stable tag: 4.4
 
 Use an external authentication source in WordPress.
@@ -142,6 +142,7 @@ This would be modified for each environment as appropriate.
 * Add option to support additional $_SERVER variables in authentication (#1477)
 * Remove use of call-time pass by reference to avoid warnings on PHP 5.3 and newer
 * Fix deprecation notice in WordPress 3.3 on `get_userdatabylogin` (#1513)
+* Fix deprecation notice in WordPress 3.1 and later for including wp-includes/registration.php
 * Associate options page label tags with their input fields (#1514)
 
 = 4.4 =
